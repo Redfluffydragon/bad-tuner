@@ -1,10 +1,27 @@
+:root {
+  --red: #bd1b08;
+  --gray0: rgb(66, 66, 66);
+  --gray1: #303030;
+}
 body {
   width: 100%;
   margin: 0;
+  padding: 0;
   text-align: center;
   font-family: sans-serif;
   font-size: calc(12px + 4vmax);
+  overflow: hidden;
   --rotation: 0deg;
+  --settings-max-height: 35px;
+}
+
+button {
+  background: lightgray;
+  border: none;
+  font-size: calc(12px + 1vmax);
+  border-radius: 5px;
+  cursor: pointer;
+  padding: 7px 9px;
 }
 
 #canvas {
@@ -13,7 +30,7 @@ body {
 
 #noteDisplay {
   margin-bottom: 10px;
-  color: #bd1b08;
+  color: var(--red);
   position: relative;
 }
 
@@ -30,13 +47,13 @@ body {
 #frequencyDisplay {
   font-size: calc(12px + 3vmax);
   margin-top: 10px;
-  color: rgb(66, 66, 66);
+  color: var(--gray0);
 }
 
 #fineTuner {
   margin-top: calc(10px + 3vh);
   text-align: center;
-  transition-duration: .1s;
+  transition: rotate .2s;
 }
 
 #fineTunePointer {
@@ -48,6 +65,137 @@ body {
   transform: rotate(var(--rotation));
 }
 
+#settingsBtn {
+  position: absolute;
+  bottom: 15px;
+  transform: translate(-50%);
+}
+
+#settings {
+  font-size: calc(12px + .7vw);
+  position: absolute;
+  display: inline-block;
+  bottom: 0;
+  min-width: calc(200px + 2vw);
+  max-height: var(--settings-max-height);
+  transform: translateX(-50%);
+  background: lightgray;
+  border-top-right-radius: 5px;
+  border-top-left-radius: 5px;
+  padding: 10px;
+  padding-top: 0;
+  transition: max-height .5s;
+  text-align: left;
+  color: var(--gray0);
+}
+
+#openSettings {
+  cursor: pointer;
+  width: 100%;
+  position: relative;
+  left: -10px;
+  padding-left: 10px;
+  padding-top: 10px;
+  padding-right: 10px;
+}
+
+#settingsList {
+  list-style-type: none;
+  padding: 0;
+  white-space: nowrap;
+}
+
+#settingsList li {
+  margin: 7px auto;
+  margin-right: 110px;
+}
+
+#settingsList li input[type=range] {
+  position: absolute;
+  right: 10px;
+}
+
+#settingsList p {
+  display: inline;
+}
+
+#settingsList li input[type=checkbox] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  width: 0;
+  height: 0;
+}
+
+.checkmark {
+  position: absolute;
+  right: 47.5px;
+  display: inline-block;
+  height: 25px;
+  width: 25px;
+  border-radius: 5px;
+  background: var(--gray0);
+}
+
+.checkmark:hover {
+  background: var(--gray1);
+}
+
+#settingsList li input[type=checkbox]:checked ~ .checkmark {
+  background: var(--red);
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+  left: 9px;
+  top: 5px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  transform: rotate(45deg);
+}
+
+#settingsList li input[type=checkbox]:checked ~ .checkmark:after {
+  display: block;
+}
+
+.slider {
+  -webkit-appearance: none;
+  width: 100px;
+  height: 7px;
+  border-radius: 3.5px;  
+  background: var(--gray0);
+  outline: none;
+  vertical-align: center;
+  margin: 5px;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none; 
+  appearance: none;
+  width: 15px; 
+  height: 15px; 
+  background:var(--red);
+  cursor: pointer; 
+  border-radius: 12px;
+}
+
+.showInput {
+  border: .5px solid var(--gray0);
+  border-radius: 4px;
+  padding: 3px;
+  width: 40px;
+  background: transparent;
+}
+
+#showSensitivity {
+  position: relative;
+  float: right;
+}
+
 @media screen and (max-width: 900px) {
   #frequencyDisplay {
     font-size: calc(25px + 4vmax);
@@ -57,6 +205,9 @@ body {
   }
   #octave {
     font-size: calc(18px + 4vmax);
+  }
+  #settings {
+    font-size: calc(12px + 1vw);
   }
   body {
     font-size: calc(25px + 5vmax);
@@ -73,8 +224,10 @@ body {
   #octave {
     font-size: calc(18px + 5vmax);
   }
+  #settings {
+    font-size: calc(12px + 2vw);
+  }
   body {
     font-size: calc(25px + 6vmax);
   }
 }
-

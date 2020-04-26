@@ -4,13 +4,25 @@
 
 'use strict'
 
+//ask for microphone use
+// navigator.mediaDevices.getUserMedia({ audio: true}).then(handleSuccess);
+
 const frequencyDisplay = document.getElementById('frequencyDisplay');
 const noteDisplay = document.getElementById('noteDisplay');
 const noteLetter = document.getElementById('noteLetter');
 const accidental = document.getElementById('accidental');
 const octave = document.getElementById('octave');
 
-const fineTunePointer = document.getElementById('fineTunePointer');
+const settings = document.getElementById('settings');
+const openSettings = document.getElementById('openSettings');
+
+const freqCheck = document.getElementById('freqCheck');
+
+const adjustPrecision = document.getElementById('adjustPrecision');
+const showPrecision = document.getElementById('showPrecision');
+
+const adjustSensitivity = document.getElementById('adjustSensitivity');
+const showSensitivity = document.getElementById('showSensitivity');
 
 const notes = ['A', 'B&flat;', 'B', 'C', 'C&sharp;', 'D', 'E&flat;', 'E', 'F', 'F&sharp;', 'G', 'A&flat;'];
 
@@ -20,31 +32,78 @@ canvas.width = window.innerWidth;
 ctx.strokeStyle = 'black';
 ctx.lineWidth = 5;
 
+let analyser;
+
+//for adjustment
+let options = JSON.parse(localStorage.getItem('options')) || 
+  {
+    roundFreq: true,
+    fftSize: 14,
+    minDecibels: -60,
+  };
+
+freqCheck.checked = options.roundFreq;
+adjustPrecision.value = options.fftSize;
+showPrecision.value = Math.pow(2, options.fftSize);
+adjustSensitivity.value = options.minDecibels*-1;
+showSensitivity.value = options.minDecibels*-1;
+
+document.body.style.setProperty('--settings-max-height', '35px'); //not sure why I need to do this, but it works
+
 window.addEventListener('resize', () => {
   canvas.width = window.innerWidth;
 }, false);
 
-//for adjustment (later)
-let options = {
-  roundFreq: true,
-  fftSize: 14,
-  minDecibels: -60,
-};
+window.addEventListener('beforeunload', () => {
+  localStorage.setItem('options', JSON.stringify(options));
+}, false);
 
-let roundFreq = true; //round the frequency to tenths or not
+document.addEventListener('click', e => {
+  if (!e.target.closest('#settings')) {
+    document.body.style.setProperty('--settings-max-height', '35px');
+  }
+}, false);
 
-//ask for microphone use
-navigator.mediaDevices.getUserMedia({ audio: true})
-.then(handleSuccess);
+openSettings.addEventListener('click', () => {
+  let settingsHeight = getComputedStyle(document.body).getPropertyValue('--settings-max-height') === '35px' ? '150px' : '35px';
+  document.body.style.setProperty('--settings-max-height', settingsHeight);
+}, false);
+
+freqCheck.addEventListener('input', () => {
+  options.roundFreq = freqCheck.checked;
+}, false);
+
+adjustPrecision.addEventListener('input', () => {
+  showPrecision.value = Math.pow(2, adjustPrecision.value);
+  options.fftSize = adjustPrecision.value;
+  updateAnalyser();
+}, false);
+
+adjustSensitivity.addEventListener('input', () => {
+  showSensitivity.value = adjustSensitivity.value;
+  options.minDecibels = adjustSensitivity.value*-1;
+  updateAnalyser();
+}, false);
+
+showSensitivity.addEventListener('input', () => {
+  if (showSensitivity.value.length === 2) {
+    showSensitivity.value = Math.max(parseInt(showSensitivity.value), 40);
+  }
+  else if (showSensitivity.value.length >= 3) {
+    showSensitivity.value = Math.min(parseInt(showSensitivity.value), 100);
+  }
+  adjustSensitivity.value = showSensitivity.value;
+  options.minDecibels = adjustSensitivity.value*-1;
+  updateAnalyser();
+}, false);
 
 function handleSuccess(stream) {
   //get the audio context and create an analyser
   let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  let analyser = audioCtx.createAnalyser();
+  analyser = audioCtx.createAnalyser();
 
   //set some properties to better values for this
-  analyser.fftSize = Math.pow(2, options.fftSize); //adjust number of frequency bins (higher = more precision)
-  analyser.minDecibels = options.minDecibels; //adjust lower decibel cutoff (sensitivity, basically) more negative = more sensitive
+  updateAnalyser();
 
   //make an audio source and connect it to the analyser
   let source = audioCtx.createMediaStreamSource(stream);
@@ -57,7 +116,7 @@ function handleSuccess(stream) {
     requestAnimationFrame(showFrequency);
     analyser.getByteFrequencyData(soundArray);
     let frequency = soundArray.indexOf(Math.max(...soundArray))*audioCtx.sampleRate/analyser.fftSize; //get the loudest bin and map to Hz
-    if (roundFreq) frequency = frequency.toFixed(1);
+    if (options.roundFreq) frequency = frequency.toFixed(1);
     if (frequency != 0.0) {
       frequencyDisplay.textContent = frequency + ' Hz';
       showNote(frequency);
@@ -66,6 +125,11 @@ function handleSuccess(stream) {
     }
   }
   showFrequency();
+}
+
+function updateAnalyser() {
+  analyser.fftSize = Math.pow(2, options.fftSize); //adjust number of frequency bins (higher = more precision)
+  analyser.minDecibels = options.minDecibels; //adjust lower decibel cutoff (sensitivity, basically) more negative = more sensitive
 }
 
 function toSteps(frequency) {
