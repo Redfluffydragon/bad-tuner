@@ -16,6 +16,28 @@
 				<div id="fineTunePointer"></div>
 			</div>
 			<h1 id="noteDisplay"><span id="noteLetter">A</span><span id="accidental"></span><span id="octave">4</span></h1>
-			<h1 id="frequencyDisplay">440 Hz</h1>
+			<h1 id="frequencyDisplay">440.0 Hz</h1>
+			<div id="settings">
+				<div id="openSettings">Settings</div>
+				<ul id="settingsList">
+					<li title="To nearest tenth">
+						<label>
+							Round frequency:
+							<input id="freqCheck" type="checkbox" checked>
+							<span class="checkmark"></span>
+						</label>
+					</li>
+					<li title="May help with performance">
+						Frequency precision:
+						<input type="range" min="11" max="15" value="14" id="adjustPrecision" class="slider">
+						<input id="showPrecision" class="showInput" value="16384" readonly>
+					</li>
+					<li title=" More negative is more sensitive">
+						Sensitivity:
+						<input type="range" min="40" max="100" value="60" id="adjustSensitivity" class="slider">
+						<input id="showSensitivity" class="showInput" min="40" max="100" value="60" type="number" pattern="[0-9]*">
+					</li>
+				</ul>
+			</div>
 	</body>
 </html>
