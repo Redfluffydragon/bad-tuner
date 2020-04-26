@@ -5,7 +5,7 @@
 'use strict'
 
 //ask for microphone use
-// navigator.mediaDevices.getUserMedia({ audio: true}).then(handleSuccess);
+navigator.mediaDevices.getUserMedia({ audio: true}).then(handleSuccess);
 
 const frequencyDisplay = document.getElementById('frequencyDisplay');
 const noteDisplay = document.getElementById('noteDisplay');
