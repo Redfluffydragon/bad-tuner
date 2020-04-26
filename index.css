@@ -1,0 +1,80 @@
+body {
+  width: 100%;
+  margin: 0;
+  text-align: center;
+  font-family: sans-serif;
+  font-size: calc(12px + 4vmax);
+  --rotation: 0deg;
+}
+
+#canvas {
+  display: none;
+}
+
+#noteDisplay {
+  margin-bottom: 10px;
+  color: #bd1b08;
+  position: relative;
+}
+
+#accidental {
+  position: absolute;
+  top: 0;
+  font-size: calc(6px + 4vmax);
+}
+
+#octave {
+  font-size: calc(5px + 4vmax);
+}
+
+#frequencyDisplay {
+  font-size: calc(12px + 3vmax);
+  margin-top: 10px;
+  color: rgb(66, 66, 66);
+}
+
+#fineTuner {
+  margin-top: calc(10px + 3vh);
+  text-align: center;
+  transition-duration: .1s;
+}
+
+#fineTunePointer {
+  display: inline-block;
+  width: 3px;
+  height: 35vh;
+  background: black;
+  transform-origin: 50% 100%;
+  transform: rotate(var(--rotation));
+}
+
+@media screen and (max-width: 900px) {
+  #frequencyDisplay {
+    font-size: calc(25px + 4vmax);
+  }
+  #accidental {
+    font-size: calc(19px + 4vmax);
+  }
+  #octave {
+    font-size: calc(18px + 4vmax);
+  }
+  body {
+    font-size: calc(25px + 5vmax);
+  }
+}
+
+@media all and (orientation: portrait) {
+  #frequencyDisplay {
+    font-size: calc(25px + 5vmax);
+  }
+  #accidental {
+    font-size: calc(19px + 5vmax);
+  }
+  #octave {
+    font-size: calc(18px + 5vmax);
+  }
+  body {
+    font-size: calc(25px + 6vmax);
+  }
+}
+

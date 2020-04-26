@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+    <meta charset="utf-8"/>
+		<title>Online Tuner</title>
+		<script src="index.js" defer></script>
+		<link rel="stylesheet" href="index.css">
+		<link rel="manifest" href="manifest.json"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+		<link rel="icon" href="icon.png" type="img/png">
+    <meta name="description" content="A simple javascript web audio based chromatic tuner."/>
+	</head>
+	<body>
+			<canvas id="canvas" height="200" width="500"></canvas>
+			<div id="fineTuner">
+				<div id="fineTunePointer"></div>
+			</div>
+			<h1 id="noteDisplay"><span id="noteLetter">A</span><span id="accidental"></span><span id="octave">4</span></h1>
+			<h1 id="frequencyDisplay">440 Hz</h1>
+	</body>
+</html>

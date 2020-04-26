@@ -1,0 +1,16 @@
+{
+  "short_name": "Tuner",
+  "name": "Tuner",
+  "description": "A simple javascript web audio based chromatic tuner.",
+  "icons": [
+    {
+      "src": "icon.png",
+      "type": "img/png",
+      "sizes": "620x620"
+    }
+  ],
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#FFFFFF"
+}
