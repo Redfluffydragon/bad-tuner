@@ -2,18 +2,25 @@
 <html lang="en">
 	<head>
     <meta charset="utf-8"/>
-		<title>Online Tuner</title>
-		<script src="index.js" defer></script>
+		<title>Tuner</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/> <!-- , maximum-scale=1, user-scalable=no -->
 		<link rel="stylesheet" href="index.css">
 		<link rel="manifest" href="manifest.json"/>
     <meta name="apple-mobile-web-app-capable" content="yes"/>
 		<link rel="icon" href="icon.png" type="img/png">
-    <meta name="description" content="A simple javascript web audio based chromatic tuner."/>
+		<meta name="description" content="A simple javascript web audio based chromatic tuner."/>
+		<script src="index.js" defer></script>
 	</head>
 	<body>
-			<canvas id="canvas" height="200" width="500"></canvas>
 			<div id="fineTuner">
 				<div id="fineTunePointer"></div>
+				<div id="left3Mark" class="tuningMark"></div>
+				<div id="left2Mark" class="tuningMark"></div>
+				<div id="left1Mark" class="tuningMark"></div>
+				<div id="centerMark" class="tuningMark"></div>
+				<div id="right1Mark" class="tuningMark"></div>
+				<div id="right2Mark" class="tuningMark"></div>
+				<div id="right3Mark" class="tuningMark"></div>
 			</div>
 			<h1 id="noteDisplay"><span id="noteLetter">A</span><span id="accidental"></span><span id="octave">4</span></h1>
 			<h1 id="frequencyDisplay">440.0 Hz</h1>
@@ -32,7 +39,7 @@
 						<input type="range" min="11" max="15" value="14" id="adjustPrecision" class="slider">
 						<input id="showPrecision" class="showInput" value="16384" readonly>
 					</li>
-					<li title=" More negative is more sensitive">
+					<li title="reversed minimum decibels">
 						Sensitivity:
 						<input type="range" min="40" max="100" value="60" id="adjustSensitivity" class="slider">
 						<input id="showSensitivity" class="showInput" min="40" max="100" value="60" type="number" pattern="[0-9]*">

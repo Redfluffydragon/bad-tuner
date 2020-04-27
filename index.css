@@ -1,8 +1,16 @@
 :root {
-  --red: #bd1b08;
-  --gray0: rgb(66, 66, 66);
-  --gray1: #303030;
+  /* --red: #bd1b08; */
+  --red: #b11a0a;
+  --gray0: lightgray;
+  --gray1: #7e7e7e;
+  --gray2: rgb(66, 66, 66);
+  --gray3: #303030;
 }
+
+html {
+  overflow: hidden;
+}
+
 body {
   width: 100%;
   margin: 0;
@@ -11,8 +19,12 @@ body {
   font-family: sans-serif;
   font-size: calc(12px + 4vmax);
   overflow: hidden;
+  position: relative;
+  height: 100%;
   --rotation: 0deg;
-  --settings-max-height: 35px;
+  --settingsY: 135px;
+  --settingsX: -50%;
+  --settings-sideways: 1;
 }
 
 button {
@@ -22,10 +34,6 @@ button {
   border-radius: 5px;
   cursor: pointer;
   padding: 7px 9px;
-}
-
-#canvas {
-  display: none;
 }
 
 #noteDisplay {
@@ -47,22 +55,57 @@ button {
 #frequencyDisplay {
   font-size: calc(12px + 3vmax);
   margin-top: 10px;
-  color: var(--gray0);
+  color: var(--gray2);
 }
 
 #fineTuner {
   margin-top: calc(10px + 3vh);
   text-align: center;
-  transition: rotate .2s;
+  position: relative;
 }
 
 #fineTunePointer {
   display: inline-block;
   width: 3px;
   height: 35vh;
-  background: black;
+  background: var(--gray3);
   transform-origin: 50% 100%;
   transform: rotate(var(--rotation));
+  transition: rotate .2s;
+}
+
+.tuningMark {
+  height: 20px;
+  width: 2px;
+  background: var(--gray3);
+  display: inline-block;
+  position: absolute;
+  transform-origin: 50% 35vh;
+  transform: translateX(-100%);
+}
+
+#right1Mark {
+  transform: translateX(-100%) rotate(15deg);
+}
+
+#right2Mark {
+  transform: translateX(-100%) rotate(30deg);
+}
+
+#right3Mark {
+  transform: translateX(-100%) rotate(45deg);
+}
+
+#left1Mark {
+  transform: translateX(-100%) rotate(-15deg);
+}
+
+#left2Mark {
+  transform: translateX(-100%) rotate(-30deg);
+}
+
+#left3Mark {
+  transform: translateX(-100%) rotate(-45deg);
 }
 
 #settingsBtn {
@@ -73,36 +116,43 @@ button {
 
 #settings {
   font-size: calc(12px + .7vw);
-  position: absolute;
+  position: fixed;
   display: inline-block;
+  display: flex;
+  flex-direction: column;
+  margin-left: 50%;
   bottom: 0;
-  min-width: calc(200px + 2vw);
-  max-height: var(--settings-max-height);
-  transform: translateX(-50%);
+  margin-bottom: -20px;
+  transform: translate(var(--settingsX), var(--settingsY));
   background: lightgray;
   border-top-right-radius: 5px;
   border-top-left-radius: 5px;
   padding: 10px;
   padding-top: 0;
-  transition: max-height .5s;
+  transition: max-height .4s, transform .4s;
   text-align: left;
-  color: var(--gray0);
+  color: var(--gray2);
+  height: min-content;
 }
 
 #openSettings {
+  color: var(--gray3);
   cursor: pointer;
   width: 100%;
   position: relative;
   left: -10px;
-  padding-left: 10px;
-  padding-top: 10px;
-  padding-right: 10px;
+  padding: 10px;
+  background: var(--gray1);
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
 }
 
 #settingsList {
   list-style-type: none;
   padding: 0;
   white-space: nowrap;
+  margin-top: 5px;
+  position: relative;
 }
 
 #settingsList li {
@@ -112,7 +162,7 @@ button {
 
 #settingsList li input[type=range] {
   position: absolute;
-  right: 10px;
+  right: -2px;
 }
 
 #settingsList p {
@@ -134,11 +184,11 @@ button {
   height: 25px;
   width: 25px;
   border-radius: 5px;
-  background: var(--gray0);
+  background: var(--gray2);
 }
 
 .checkmark:hover {
-  background: var(--gray1);
+  background: var(--gray3);
 }
 
 #settingsList li input[type=checkbox]:checked ~ .checkmark {
@@ -167,7 +217,7 @@ button {
   width: 100px;
   height: 7px;
   border-radius: 3.5px;  
-  background: var(--gray0);
+  background: var(--gray2);
   outline: none;
   vertical-align: center;
   margin: 5px;
@@ -180,11 +230,12 @@ button {
   height: 15px; 
   background:var(--red);
   cursor: pointer; 
-  border-radius: 12px;
+  border-radius: 50%;
+  border: none;
 }
 
 .showInput {
-  border: .5px solid var(--gray0);
+  border: .5px solid var(--gray2);
   border-radius: 4px;
   padding: 3px;
   width: 40px;
@@ -197,6 +248,9 @@ button {
 }
 
 @media screen and (max-width: 900px) {
+  #noteDisplay {
+    margin-top: 30px;
+  }
   #frequencyDisplay {
     font-size: calc(25px + 4vmax);
   }
@@ -214,20 +268,68 @@ button {
   }
 }
 
-@media all and (orientation: portrait) {
+@media screen and (max-width: 320px) {
+  #settings {
+    max-width: 90vw;
+  }
+  .showInput {
+    width: 30px;
+  }
+  .slider::-webkit-slider-thumb {
+    width: 25px; 
+    height: 25px; 
+  }
+  #settingsList li {
+    margin-top: 22px;
+  }
   #frequencyDisplay {
-    font-size: calc(25px + 5vmax);
+    font-size: calc(12px + 3vmax);
+    margin-top: 0;
   }
-  #accidental {
-    font-size: calc(19px + 5vmax);
+  #noteDisplay {
+    margin-top: 15px;
   }
-  #octave {
-    font-size: calc(18px + 5vmax);
+}
+
+@media screen and (max-height: 400px) {
+  #noteDisplay {
+    margin-top: .5vh;
+    margin-bottom: 0;
+  }
+  #fineTuner {
+    margin-top: calc(12px + 1vh);
+  }
+  #frequencyDisplay {
+    margin-top: 0;
+  }
+}
+
+@media all and (orientation: landscape) and (max-height: 550px) {
+  body {
+    --settingsX: -325px;
+    --settingsY: -50%;
+    --settings-sideways: 0;
   }
   #settings {
-    font-size: calc(12px + 2vw);
+    margin-left: 0;
+    transform: translate(var(--settingsX), var(--settingsY));
+    top: 50%;
+    flex-direction: row-reverse;
+    height: min-content;
+    border-top-left-radius: 0;
+    border-bottom-right-radius: 5px;
+    width: min-content;
+    padding-bottom: 0;
   }
-  body {
-    font-size: calc(25px + 6vmax);
+  #openSettings {
+    text-orientation: sideways;
+    writing-mode: vertical-lr;
+    left: 10px;
+    top: 0;
+    border-top-left-radius: 0;
+    border-bottom-right-radius: 5px;
+  }
+  #frequencyDisplay {
+    font-size: calc(12px + 3vmax);
   }
 }
