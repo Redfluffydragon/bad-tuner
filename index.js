@@ -7,7 +7,16 @@
 'use strict'
 
 //ask for microphone use
-navigator.mediaDevices.getUserMedia({ audio: true }).then(handleSuccess)
+async function getMedia(constraints) {
+  let stream = null;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia(constraints);
+    handleSuccess(stream);
+  } catch(err) {
+    alert(err); //for mobile debugging
+  }
+}
+getMedia({ audio: true });
 
 const frequencyDisplay = document.getElementById('frequencyDisplay');
 const noteDisplay = document.getElementById('noteDisplay');
@@ -49,21 +58,6 @@ let settingsOpen = false;
 
 //move the settings div in either the x or y dimension depending on a css variable
 let moveSettingsAxis = getComputedStyle(document.body).getPropertyValue('--settings-sideways') == 0 ? 'X' : 'Y';
-
-//for moving the settings in and out
-function moveSettings(resizing=false) {
-  let tempSet;
-  if ((!settingsOpen && resizing) || (settingsOpen && !resizing)) { //if it's closed and just resizing, or if it's open and not resizing, set to closed posiiton
-    tempSet = closedVals[moveSettingsAxis]();
-  }
-  else {
-    tempSet = 0;
-  }
-  if (!resizing) { //toggle open and closed for js
-    settingsOpen = settingsOpen ? false : true;
-  }
-  document.body.style.setProperty('--settings' + moveSettingsAxis, tempSet);
-}
 
 window.addEventListener('load', () => {
   moveSettingsAxis = getComputedStyle(document.body).getPropertyValue('--settings-sideways') == 0 ? 'X' : 'Y';
@@ -147,7 +141,7 @@ function handleSuccess(stream) {
 
   /* let oneresult = ''  
   for (let i = 0; i < 1000; i++) {
-    oneresult += toSteps(i*audioCtx.sampleRate/analyser.fftSize)+'\n';
+    oneresult += toSteps(i*audioCtx.sampleRate/analyser.fftSize)+'\n'; //for testing note curve against standard one
   }
   console.log(oneresult); */
 
@@ -156,12 +150,20 @@ function handleSuccess(stream) {
     requestAnimationFrame(showFrequency);
     analyser.getByteFrequencyData(soundArray);
     let frequency = soundArray.indexOf(Math.max(...soundArray))*audioCtx.sampleRate/analyser.fftSize; //get the loudest bin and map to Hz
-    if (options.roundFreq) frequency = frequency.toFixed(1);
-    if (frequency != 0.0) {
+    if (frequency !== 0) {
+      if (options.roundFreq) frequency = frequency.toFixed(1);
       frequencyDisplay.textContent = frequency + ' Hz';
       showNote(frequency);
-      let showFineTune = fineTune(frequency);
-      document.body.style.setProperty('--rotation', `${showFineTune*2*45}deg`); //pass to css variable
+      let showFineTune = fineTune(frequency)*2*45; //max is about +-0.5, so scale to 45 deg each way
+      
+      if (Math.abs(showFineTune) < 2) { //change to green if it's close enough - add setting for this?
+        noteDisplay.classList.replace('red', 'green');
+      }
+      else {
+        noteDisplay.classList.replace('green', 'red');
+      }
+      document.body.style.setProperty('--rotation', `${showFineTune}deg`); //pass to css variable
+
     }
   }
   showFrequency();
@@ -189,11 +191,26 @@ function showNote(frequency) {
   let tempNote = notes[fixSteps];
   noteLetter.textContent = tempNote.slice(0, 1);
   accidental.innerHTML = tempNote.slice(1);
-  octave.textContent = Math.trunc(steps/notes.length)+4;
+  octave.textContent = Math.max(Math.trunc((steps+9)/notes.length)+4, 0); //have to add nine so it changes the octave on C instead of A
 }
 
 //max value: ~0.49 - gives difference between current frequency and nearest note
 function fineTune(frequency) {
   let steps = toSteps(frequency)
   return steps - Math.round(steps); //flat should be negative, and sharp should be positive
+}
+
+//for moving the settings in and out
+function moveSettings(resizing=false) {
+  let tempSet;
+  if ((!settingsOpen && resizing) || (settingsOpen && !resizing)) { //if it's closed and just resizing, or if it's open and not resizing, set to closed posiiton
+    tempSet = closedVals[moveSettingsAxis]();
+  }
+  else {
+    tempSet = 0;
+  }
+  if (!resizing) { //toggle open and closed for js
+    settingsOpen = settingsOpen ? false : true;
+  }
+  document.body.style.setProperty('--settings' + moveSettingsAxis, tempSet);
 }

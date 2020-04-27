@@ -6,9 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1"/> <!-- , maximum-scale=1, user-scalable=no -->
 		<link rel="stylesheet" href="index.css">
 		<link rel="manifest" href="manifest.json"/>
-    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <!-- <meta name="apple-mobile-web-app-capable" content="yes"/> -->
 		<link rel="icon" href="icon.png" type="img/png">
 		<meta name="description" content="A simple javascript web audio based chromatic tuner."/>
+    <link rel="apple-touch-icon" sizes="144x144" href="/img/apple-touch-icon.png"/>
 		<script src="index.js" defer></script>
 	</head>
 	<body>
@@ -22,7 +23,7 @@
 				<div id="right2Mark" class="tuningMark"></div>
 				<div id="right3Mark" class="tuningMark"></div>
 			</div>
-			<h1 id="noteDisplay"><span id="noteLetter">A</span><span id="accidental"></span><span id="octave">4</span></h1>
+			<h1 id="noteDisplay" class="red"><span id="noteLetter">A</span><span id="accidental"></span><span id="octave">4</span></h1>
 			<h1 id="frequencyDisplay">440.0 Hz</h1>
 			<div id="settings">
 				<div id="openSettings">Settings</div>
