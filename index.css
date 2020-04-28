@@ -1,13 +1,3 @@
-:root {
-  /* --red: #bd1b08; */
-  --red: #b11a0a;
-  --green: #085c08;
-  --gray0: lightgray;
-  --gray1: #7e7e7e;
-  --gray2: rgb(66, 66, 66);
-  --gray3: #303030;
-}
-
 body {
   width: 100%;
   margin: 0;
@@ -15,21 +5,44 @@ body {
   text-align: center;
   font-family: sans-serif;
   font-size: calc(12px + 4vmax);
-  position: relative;
   height: 100%;
+  background: var(--background);
+  position: fixed;
   --rotation: 0deg;
-  --settingsY: 135px;
+  --settingsY: 75%;
   --settingsX: -50%;
   --settings-sideways: 1;
 }
 
-button {
-  background: lightgray;
-  border: none;
-  font-size: calc(12px + 1vmax);
-  border-radius: 5px;
-  cursor: pointer;
-  padding: 7px 9px;
+.light {
+  --background: white;
+  --settings-background: white;
+  --red: #aa0101;
+  --green: #085c08;
+  --gray0: lightgray;
+  --gray1: rgb(66, 66, 66);
+  --gray2: rgb(66, 66, 66);
+  --gray3: #303030;
+  --shadow: rgba(0, 0, 0, .1);
+}
+
+.dark {
+  --background: rgb(29, 29, 29);
+  --settings-background: rgb(12, 12, 12);
+  --red: #9c0202;
+  --green: #085c08;
+  --gray0: lightgray;
+  --gray1: rgb(97, 97, 97);
+  --gray2: rgb(102, 102, 102);
+  --gray3: #8f8f8f;
+  --shadow: rgba(0, 0, 0, 0);
+}
+
+hr {
+  position: relative;
+  border: 1px solid var(--gray2);
+  margin: 0;
+  background: var(--gray2);
 }
 
 #noteDisplay {
@@ -53,6 +66,10 @@ button {
   color: var(--gray2);
 }
 
+#hz {
+  font-size: 70%;
+}
+
 #fineTuner {
   margin-top: calc(10px + 3vh);
   text-align: center;
@@ -61,12 +78,20 @@ button {
 
 #fineTunePointer {
   display: inline-block;
-  width: 3px;
+  position: relative;
+  width: 2px;
   height: 35vh;
   background: var(--gray3);
   transform-origin: 50% 100%;
   transform: rotate(var(--rotation));
-  transition: transform .2s;
+  transition: transform .3s;
+}
+
+#fineTuneMarks {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .tuningMark {
@@ -76,37 +101,12 @@ button {
   display: inline-block;
   position: absolute;
   transform-origin: 50% 35vh;
-  transform: translateX(-100%);
+  transform: translateX(-50%);
 }
 
-#right1Mark {
-  transform: translateX(-100%) rotate(15deg);
-}
-
-#right2Mark {
-  transform: translateX(-100%) rotate(30deg);
-}
-
-#right3Mark {
-  transform: translateX(-100%) rotate(45deg);
-}
-
-#left1Mark {
-  transform: translateX(-100%) rotate(-15deg);
-}
-
-#left2Mark {
-  transform: translateX(-100%) rotate(-30deg);
-}
-
-#left3Mark {
-  transform: translateX(-100%) rotate(-45deg);
-}
-
-#settingsBtn {
-  position: absolute;
-  bottom: 15px;
-  transform: translate(-50%);
+.bigTick {
+  width: 2px;
+  height: 15px;
 }
 
 #settings {
@@ -117,16 +117,16 @@ button {
   flex-direction: column;
   margin-left: 50%;
   bottom: 0;
-  margin-bottom: -20px;
   transform: translate(var(--settingsX), var(--settingsY));
-  background: lightgray;
+  background: var(--settings-background);
+  box-shadow: 10px -10px 20px var(--shadow), -10px -10px 20px var(--shadow);
   border-top-right-radius: 5px;
   border-top-left-radius: 5px;
   padding: 10px;
   padding-top: 0;
   transition: max-height .4s, transform .4s;
   text-align: left;
-  color: var(--gray2);
+  color: var(--gray1);
   height: min-content;
 }
 
@@ -137,9 +137,10 @@ button {
   position: relative;
   left: -10px;
   padding: 10px;
-  background: var(--gray1);
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
+  font-size: calc(12px + .7vw);
+  font-weight: bold;
 }
 
 #settingsList {
@@ -148,6 +149,7 @@ button {
   white-space: nowrap;
   margin-top: 5px;
   position: relative;
+  margin-bottom: 0;
 }
 
 #settingsList li {
@@ -160,10 +162,6 @@ button {
   right: -2px;
 }
 
-#settingsList p {
-  display: inline;
-}
-
 #settingsList li input[type=checkbox] {
   position: absolute;
   opacity: 0;
@@ -174,16 +172,13 @@ button {
 
 .checkmark {
   position: absolute;
-  right: 47.5px;
+  right: 37.5px;
   display: inline-block;
   height: 25px;
-  width: 25px;
-  border-radius: 5px;
+  width: 45px;
+  border-radius: 12.5px;
   background: var(--gray2);
-}
-
-.checkmark:hover {
-  background: var(--gray3);
+  cursor: pointer;
 }
 
 #settingsList li input[type=checkbox]:checked ~ .checkmark {
@@ -193,18 +188,17 @@ button {
 .checkmark:after {
   content: "";
   position: absolute;
-  display: none;
-  left: 9px;
-  top: 5px;
-  width: 5px;
-  height: 10px;
-  border: solid white;
-  border-width: 0 3px 3px 0;
-  transform: rotate(45deg);
+  left: 2.5px;
+  top: 2.5px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--settings-background);
+  transition: transform .3s;
 }
 
 #settingsList li input[type=checkbox]:checked ~ .checkmark:after {
-  display: block;
+  transform: translateX(20px);
 }
 
 .slider {
@@ -214,16 +208,17 @@ button {
   border-radius: 3.5px;  
   background: var(--gray2);
   outline: none;
-  vertical-align: center;
+  vertical-align: middle;
+  display: inline-block;
   margin: 5px;
 }
 
 .slider::-webkit-slider-thumb {
   -webkit-appearance: none; 
   appearance: none;
-  width: 15px; 
-  height: 15px; 
-  background:var(--red);
+  width: 17px; 
+  height: 17px; 
+  background: var(--red);
   cursor: pointer; 
   border-radius: 50%;
   border: none;
@@ -233,13 +228,28 @@ button {
   border: .5px solid var(--gray2);
   border-radius: 4px;
   padding: 3px;
-  width: 40px;
+  width: 50px;
   background: transparent;
-}
-
-#showSensitivity {
+  color: var(--gray2);
   position: relative;
   float: right;
+  font-size: calc(12px + .4vw);
+}
+
+#showPrecision {
+  float: unset;
+}
+
+#settingsList li:last-child {
+  text-align: center;
+}
+
+#reloader {
+  position: relative;
+  color: var(--gray1);
+  font-size: 80%;
+  left: 55px;
+  display: inline-block;
 }
 
 @media screen and (max-width: 900px) {
@@ -268,14 +278,13 @@ button {
     max-width: 90vw;
   }
   .showInput {
-    width: 30px;
-  }
-  .slider::-webkit-slider-thumb {
-    width: 25px; 
-    height: 25px; 
+    width: 36px;
+    font-size: calc(12px + .4vw);
+    text-align: center;
   }
   #settingsList li {
-    margin-top: 22px;
+    margin-top: 18px;
+    font-size: calc(12px + .5vw);
   }
   #frequencyDisplay {
     font-size: calc(12px + 3vmax);
@@ -283,6 +292,9 @@ button {
   }
   #noteDisplay {
     margin-top: 15px;
+  }
+  hr {
+    top: 2px;
   }
 }
 
@@ -301,9 +313,13 @@ button {
 
 @media all and (orientation: landscape) and (max-height: 550px) {
   body {
-    --settingsX: -325px;
+    --settingsX: -90.5%;
     --settingsY: -50%;
     --settings-sideways: 0;
+  }
+  .showInput {
+    font-size: calc(12px + .4vw);
+    text-align: center;
   }
   #settings {
     margin-left: 0;
@@ -315,6 +331,7 @@ button {
     border-bottom-right-radius: 5px;
     width: min-content;
     padding-bottom: 0;
+    box-shadow: 10px -10px 20px var(--shadow), 10px 10px 20px var(--shadow);
   }
   #openSettings {
     text-orientation: sideways;
@@ -326,6 +343,12 @@ button {
   }
   #frequencyDisplay {
     font-size: calc(12px + 3vmax);
+  }
+  hr {
+    right: -10px;
+    display: inline-block;
+    margin-top: 10px;
+    margin-bottom: 10px;
   }
 }
 
