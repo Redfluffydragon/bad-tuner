@@ -303,7 +303,7 @@ function changeTicks() {
   }
 }
 
-//for swiping the settings open and closed
+//for swiping the settings open and closed - called on touchmove
 function swipeSettings(e) {
   let currentPos = {X: e.targetTouches[0].clientX, Y: e.targetTouches[0].clientY}; //get the current position
   if (currentPos[moveSettingsAxis] !== initialPos[moveSettingsAxis]) { //if moved in the direction the settings would move
@@ -317,6 +317,7 @@ function swipeSettings(e) {
       let closedOffset = closedVals[moveSettingsAxis](); //the closed position for the current direction
       let startOffset = settingsOpen ? 0 : closedOffset; //starting offset of the settings div when the touch starts (0 is fully open)
       let touchOffset = initialPos[moveSettingsAxis] - currentPos[moveSettingsAxis]; //how far the touch event has moved
+      console.log(touchOffset);
       let newPos = startOffset-touchOffset; //calculated new position
       
       //have to switch max and min because x goes negative and y goes positive
@@ -343,6 +344,7 @@ function swipeSettings(e) {
 
 //reset the settings position
 function resetSettingsPosition() {
+  touchMoved = false;
   document.body.style.setProperty('--settings' + moveSettingsAxis, snapPos + 'px');
   window.setTimeout(() => {
     document.body.style.setProperty('--settings' + moveSettingsAxis, snapPos + 'px'); //disgusting hack
