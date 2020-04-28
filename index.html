@@ -3,32 +3,44 @@
 	<head>
     <meta charset="utf-8"/>
 		<title>Tuner</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/> <!-- , maximum-scale=1, user-scalable=no -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/> <!--, user-scalable=no-->
 		<link rel="stylesheet" href="index.css">
 		<link rel="manifest" href="manifest.json"/>
     <link rel="canonical" href="https://redfluffydragon.github.io/tuner/"/>
     <meta name="apple-mobile-web-app-capable" content="yes"/>
-		<link rel="icon" href="icon.png" type="img/png">
+		<link rel="icon" href="img/icon.png" type="img/png">
 		<meta name="description" content="A simple javascript web audio based chromatic tuner."/>
-    <link rel="apple-touch-icon" sizes="144x144" href="img/apple-touch-icon.png"/>
+		<link rel="apple-touch-icon" sizes="144x144" href="img/apple-touch-icon.png"/>
+		<link href="splashscreens/iphone5_splash.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
+		<link href="splashscreens/iphone6_splash.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
+		<link href="splashscreens/iphoneplus_splash.png" media="(device-width: 621px) and (device-height: 1104px) and (-webkit-device-pixel-ratio: 3)" rel="apple-touch-startup-image" />
+		<link href="splashscreens/iphonex_splash.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)" rel="apple-touch-startup-image" />
+		<link href="splashscreens/iphonexr_splash.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
+		<link href="splashscreens/iphonexsmax_splash.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)" rel="apple-touch-startup-image" />
+		<link href="splashscreens/ipad_splash.png" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
+		<link href="splashscreens/ipadpro1_splash.png" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
+		<link href="splashscreens/ipadpro3_splash.png" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
+		<link href="splashscreens/ipadpro2_splash.png" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
 		<script src="index.js" defer></script>
 	</head>
-	<body>
+	<body class="light">
 			<div id="fineTuner">
 				<div id="fineTunePointer"></div>
-				<div id="left3Mark" class="tuningMark"></div>
-				<div id="left2Mark" class="tuningMark"></div>
-				<div id="left1Mark" class="tuningMark"></div>
-				<div id="centerMark" class="tuningMark"></div>
-				<div id="right1Mark" class="tuningMark"></div>
-				<div id="right2Mark" class="tuningMark"></div>
-				<div id="right3Mark" class="tuningMark"></div>
+				<div id="fineTuneMarks"></div>
 			</div>
 			<h1 id="noteDisplay" class="red"><span id="noteLetter">A</span><span id="accidental"></span><span id="octave">4</span></h1>
-			<h1 id="frequencyDisplay">440.0 Hz</h1>
+			<h1 id="frequencyDisplay"><span id="justFrequency">440.0</span><span id="hz">Hz</span></h1>
 			<div id="settings">
 				<div id="openSettings">Settings</div>
+				<hr>
 				<ul id="settingsList">
+					<li>
+						<label>
+							Dark mode:
+							<input id="darkModeCheck" type="checkbox">
+							<span class="checkmark"></span>
+						</label>
+					</li>
 					<li title="To nearest tenth">
 						<label>
 							Round frequency:
@@ -38,13 +50,26 @@
 					</li>
 					<li title="May help with performance">
 						Frequency precision:
-						<input type="range" min="11" max="15" value="14" id="adjustPrecision" class="slider">
+						<input id="adjustPrecision" class="slider" type="range" min="11" max="15" value="14">
 						<input id="showPrecision" class="showInput" value="16384" readonly>
 					</li>
 					<li title="reversed minimum decibels">
 						Sensitivity:
-						<input type="range" min="40" max="100" value="60" id="adjustSensitivity" class="slider">
-						<input id="showSensitivity" class="showInput" min="40" max="100" value="60" type="number" pattern="[0-9]*">
+						<input id="adjustSensitivity" class="slider" type="range" min="40" max="100" value="60">
+						<input id="showSensitivity" class="showInput" type="number" pattern="[0-9]*" min="40" max="100" value="60">
+					</li>
+					<li title="About one degree each, only visual">
+						Tuning proximity:
+						<input id="adjustTuning" class="slider" type="range" min="0" max="15" value="2">
+						<input  id="showTuning" class="showInput" type="number" pattern="[0-9]*" min="0" max="15" value="2">
+					</li>
+					<li>
+						Number of ticks:
+						<input id="adjustTicks" class="slider" type="range" min="7" max="15" value="9" step="2">
+						<input  id="showTicks" class="showInput"value="9" readonly>
+					</li>
+					<li>
+						<a id="reloader" href="">Reload</a>
 					</li>
 				</ul>
 			</div>
