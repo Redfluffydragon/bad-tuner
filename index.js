@@ -1,7 +1,3 @@
-/**
- * swiping settings is jittery on phone - don't know how to fix
- */
-
 'use strict'
 
 //ask for microphone use
@@ -75,7 +71,9 @@ const closedVals = {
 window.addEventListener('load', () => {
   changeTicks();
 
-  moveSettingsAxis = getComputedStyle(document.body).getPropertyValue('--settings-sideways') == 0 ? 'X' : 'Y';
+  if (isInWebApp) document.body.style.setProperty('--hacky-hack-hack', '381px'); //disgusting hack to make sure it's the right width when reloaded in landscape
+
+  moveSettingsAxis = getComputedStyle(document.body).getPropertyValue('--settings-sideways') == 0 ? 'Y' : 'X';
   document.body.style.setProperty('--settings' + moveSettingsAxis, closedVals[moveSettingsAxis]() + 'px');
 
   freqCheck.checked = options.roundFreq;
@@ -102,7 +100,8 @@ window.addEventListener('beforeunload', () => {
 
 //make sure the settings are still in the right place
 window.addEventListener('resize', () => {
-  moveSettingsAxis = getComputedStyle(document.body).getPropertyValue('--settings-sideways') == 0 ? 'X' : 'Y'; //make sure this is updated
+  if (isInWebApp) document.body.style.setProperty('--hacky-hack-hack', '0');
+  moveSettingsAxis = getComputedStyle(document.body).getPropertyValue('--settings-sideways') == 0 ? 'Y' : 'X'; //make sure this is updated
   let resetAxis = moveSettingsAxis === 'X' ? 'Y' : 'X';
   document.body.style.setProperty('--settings'+ resetAxis, '-50%');
   moveSettings(true);
@@ -134,7 +133,7 @@ let switchSettings = false;
 let framePending = false;
 
 settings.addEventListener('touchstart', e => {
-  if (e.target.tagName !== 'INPUT' && !e.target.classList.contains('checkmark')) { //don't swipe in and out on the inputs
+  if (e.target.tagName !== 'INPUT' && !e.target.classList.contains('checkmark') && e.targetTouches[0].clientY < window.innerHeight) { //don't swipe in and out on the inputs or when the touch is coming from the bottom of the screen
     snapPos = 0;
     touchMoved = false;
     switchSettings = false;
@@ -142,18 +141,23 @@ settings.addEventListener('touchstart', e => {
     initialPos = {X: e.targetTouches[0].clientX, Y: e.targetTouches[0].clientY};
     document.addEventListener('touchmove', swipeSettings, true);
 
-    settings.addEventListener('touchend', () => { //add touchend listener, once
+    settings.addEventListener('touchend', () => { //add self-removing touchend listener
+      document.body.style.setProperty('--settings-transition', 'transform .4s'); //add transition back so it's smooth the rest of the way
       if (touchMoved) {
-        switchSettings ? moveSettings() : resetSettingsPosition(); //reset or move settings depending on
-        touchMoved = false;
+        moveSettings(!switchSettings);
       }
       document.removeEventListener('touchmove', swipeSettings, true);
     }, {useCapture: true, once: true});
   }
 }, true);
 
-//to reset the settings position if the control center gets opened or something
-settings.addEventListener('touchcancel', resetSettingsPosition, false);
+//to reset the settings position if the control center gets opened or something (only sort of works)
+settings.addEventListener('touchcancel', () => { 
+  moveSettings(true); 
+  window.setTimeout(() => {
+    moveSettings(true); 
+  }, 50);
+}, false);
 
 //event listeners  for settings inputs
 darkModeCheck.addEventListener('input', () => {
@@ -276,6 +280,7 @@ function fineTune(frequency) {
 
 //for moving the settings in and out
 function moveSettings(resizing=false) {
+  touchMoved = false;
   let tempSet;
   if ((!settingsOpen && resizing) || (settingsOpen && !resizing)) { //if it's closed and just resizing, or if it's open and not resizing, set to closed posiiton
     tempSet = closedVals[moveSettingsAxis]();
@@ -306,7 +311,7 @@ function changeTicks() {
 //for swiping the settings open and closed - called on touchmove
 function swipeSettings(e) {
   let currentPos = {X: e.targetTouches[0].clientX, Y: e.targetTouches[0].clientY}; //get the current position
-  if (currentPos[moveSettingsAxis] !== initialPos[moveSettingsAxis]) { //if moved in the direction the settings would move
+  if (Math.abs(currentPos[moveSettingsAxis] - initialPos[moveSettingsAxis]) > 1) { //if moved in the direction the settings would move more than 1px
     touchMoved = true;
     if (framePending) { //if there's a frame waiting, don't add another one
       return;
@@ -317,9 +322,10 @@ function swipeSettings(e) {
       let closedOffset = closedVals[moveSettingsAxis](); //the closed position for the current direction
       let startOffset = settingsOpen ? 0 : closedOffset; //starting offset of the settings div when the touch starts (0 is fully open)
       let touchOffset = initialPos[moveSettingsAxis] - currentPos[moveSettingsAxis]; //how far the touch event has moved
-      console.log(touchOffset);
-      let newPos = startOffset-touchOffset; //calculated new position
       
+      let newPos = Math.round((startOffset-touchOffset)*100)/100; //calculated new position
+      
+      document.body.style.setProperty('--settings-transition', 'unset'); //remove transition because it makes it really jittery on ios
       //have to switch max and min because x goes negative and y goes positive
       if (moveSettingsAxis === 'Y') {
         document.body.style.setProperty('--settingsY', Math.max(Math.min(newPos, closedOffset), 0) + 'px');
@@ -340,13 +346,4 @@ function swipeSettings(e) {
       snapPos = switchSettings ? settingsOpen ? 0 : closedOffset : startOffset; //the position to snap to
     });
   }
-}
-
-//reset the settings position
-function resetSettingsPosition() {
-  touchMoved = false;
-  document.body.style.setProperty('--settings' + moveSettingsAxis, snapPos + 'px');
-  window.setTimeout(() => {
-    document.body.style.setProperty('--settings' + moveSettingsAxis, snapPos + 'px'); //disgusting hack
-  }, 50);
 }
