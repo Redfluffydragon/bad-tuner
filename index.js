@@ -1,6 +1,12 @@
 'use strict'
 
+window.onerror = e => {
+  alert(e);
+  e.preventDefault();
+}
+
 //ask for microphone use
+let analyser; //for audio analyser
 async function getMedia(constraints) {
   let stream = null;
   try {
@@ -47,7 +53,7 @@ const notes = ['A', 'B&flat;', 'B', 'C', 'C&sharp;', 'D', 'E&flat;', 'E', 'F', '
 //for storing settings
 let options = JSON.parse(localStorage.getItem('options')) || 
   {
-    darkMode: false,
+    darkMode: null,
     roundFreq: true,
     fftSize: 14,
     minDecibels: -60,
@@ -58,7 +64,13 @@ let options = JSON.parse(localStorage.getItem('options')) ||
 //standalone window or not
 let isInWebApp = (window.navigator.standalone == true) || (window.matchMedia('(display-mode: standalone)').matches);
 
-let analyser; //audio analyser
+let darkMode = getComputedStyle(document.body).getPropertyValue('--dark-mode') == 0;
+window.matchMedia('(prefers-color-scheme: dark)').addListener(() => {
+  document.body.classList = '';
+  darkMode = getComputedStyle(document.body).getPropertyValue('--dark-mode') == 0;
+  darkModeCheck.checked = darkMode;
+  options.darkMode = null;
+});
 
 let settingsOpen = false; //settings open or not
 
@@ -75,10 +87,10 @@ const closedVals = {
 window.addEventListener('load', () => {
   changeTicks();
 
-  if (isInWebApp) document.body.style.setProperty('--hacky-hack-hack', '381px'); //disgusting hack to make sure it's the right width when reloaded in landscape
+  if (isInWebApp) document.documentElement.style.setProperty('--hacky-hack-hack', '381px'); //disgusting hack to make sure it's the right width when reloaded in landscape
 
-  moveSettingsAxis = getComputedStyle(document.body).getPropertyValue('--settings-sideways') == 0 ? 'Y' : 'X';
-  document.body.style.setProperty('--settings' + moveSettingsAxis, closedVals[moveSettingsAxis]() + 'px');
+  moveSettingsAxis = getComputedStyle(document.documentElement).getPropertyValue('--settings-sideways') == 0 ? 'Y' : 'X';
+  document.documentElement.style.setProperty('--settings' + moveSettingsAxis, closedVals[moveSettingsAxis]() + 'px');
 
   freqCheck.checked = options.roundFreq;
   
@@ -91,10 +103,13 @@ window.addEventListener('load', () => {
   adjustTicks.value = options.tickNum;
   showTicks.value = options.tickNum;
 
-  if (options.darkMode) {
-    document.body.classList.replace('light', 'dark');
-    darkModeCheck.checked = options.darkMode;
+  if (options.darkMode === true) {
+    document.body.classList.add('dark');
   }
+  else if (options.darkMode === false) {
+    document.body.classList.add('light');
+  }
+  darkModeCheck.checked = options.darkMode;
 }, false);
 
 //save the options object in localstorage - ios doesn't support beforeunload
@@ -106,10 +121,10 @@ window.addEventListener(whichUnload, () => {
 
 //make sure the settings are still in the right place
 window.addEventListener('resize', () => {
-  if (isInWebApp) document.body.style.setProperty('--hacky-hack-hack', '0');
-  moveSettingsAxis = getComputedStyle(document.body).getPropertyValue('--settings-sideways') == 0 ? 'Y' : 'X'; //make sure this is updated
+  if (isInWebApp) document.documentElement.style.setProperty('--hacky-hack-hack', '0');
+  moveSettingsAxis = getComputedStyle(document.documentElement).getPropertyValue('--settings-sideways') == 0 ? 'Y' : 'X'; //make sure this is updated
   let resetAxis = moveSettingsAxis === 'X' ? 'Y' : 'X';
-  document.body.style.setProperty('--settings'+ resetAxis, '-50%');
+  document.documentElement.style.setProperty('--settings'+ resetAxis, '-50%');
   moveSettings(true);
   if (isInWebApp) {
     window.setTimeout(() => {moveSettings(true)}, 50); //disgusting hack to get rid of like 2 pixels when going from portrait to landscape in standalone mode
@@ -119,7 +134,7 @@ window.addEventListener('resize', () => {
 //click events: open/close settings and reload the page
 document.addEventListener('click', e => {
   if (!e.target.closest('#settings')) { //if not on settings, close settings
-    document.body.style.setProperty('--settings' + moveSettingsAxis, closedVals[moveSettingsAxis]() + 'px');
+    document.documentElement.style.setProperty('--settings' + moveSettingsAxis, closedVals[moveSettingsAxis]() + 'px');
     settingsOpen = false;
   }
   else if (e.target.matches('#openSettings')) {
@@ -148,7 +163,7 @@ settings.addEventListener('touchstart', e => {
     document.addEventListener('touchmove', swipeSettings, true);
 
     settings.addEventListener('touchend', () => { //add self-removing touchend listener
-      document.body.style.setProperty('--settings-transition', 'transform .4s'); //add transition back so it's smooth the rest of the way
+      document.documentElement.style.setProperty('--settings-transition', 'transform .4s'); //add transition back so it's smooth the rest of the way
       if (touchMoved) {
         moveSettings(!switchSettings);
       }
@@ -168,7 +183,14 @@ settings.addEventListener('touchcancel', () => {
 //event listeners  for settings inputs
 darkModeCheck.addEventListener('input', () => {
   options.darkMode = darkModeCheck.checked;
-  options.darkMode ? document.body.classList.replace('light', 'dark') : document.body.classList.replace('dark', 'light');
+  if (options.darkMode) {
+    document.body.classList.add('dark');
+    document.body.classList.remove('light');
+  }
+  else {
+    document.body.classList.add('light');
+    document.body.classList.remove('dark');
+  }
 }, false);
 
 freqCheck.addEventListener('input', () => {
@@ -247,7 +269,7 @@ function handleSuccess(stream) {
       else {
         noteDisplay.classList.replace('green', 'red');
       }
-      document.body.style.setProperty('--rotation', `${showFineTune}deg`); //pass to css variable
+      document.documentElement.style.setProperty('--rotation', `${showFineTune}deg`); //pass to css variable
     }
   }
   showFrequency();
@@ -297,7 +319,7 @@ function moveSettings(resizing=false) {
   if (!resizing) { //toggle open and closed for js
     settingsOpen = settingsOpen ? false : true;
   }
-  document.body.style.setProperty('--settings' + moveSettingsAxis, tempSet + 'px');
+  document.documentElement.style.setProperty('--settings' + moveSettingsAxis, tempSet + 'px');
 }
 
 //change the number of tuning ticks there are
@@ -331,13 +353,13 @@ function swipeSettings(e) {
       
       let newPos = Math.round((startOffset-touchOffset)*100)/100; //calculated new position
       
-      document.body.style.setProperty('--settings-transition', 'unset'); //remove transition because it makes it really jittery on ios
+      document.documentElement.style.setProperty('--settings-transition', 'unset'); //remove transition because it makes it really jittery on ios
       //have to switch max and min because x goes negative and y goes positive
       if (moveSettingsAxis === 'Y') {
-        document.body.style.setProperty('--settingsY', Math.max(Math.min(newPos, closedOffset), 0) + 'px');
+        document.documentElement.style.setProperty('--settingsY', Math.max(Math.min(newPos, closedOffset), 0) + 'px');
       }
       else {
-        document.body.style.setProperty('--settingsX', Math.min(Math.max(newPos, closedOffset), 0) + 'px');
+        document.documentElement.style.setProperty('--settingsX', Math.min(Math.max(newPos, closedOffset), 0) + 'px');
       }
 
       let settings90deg = moveSettingsAxis === 'Y' ? settingsOpen : !settingsOpen; //reverse settingsOpen for swiping on the x axis, because it's opposite signs

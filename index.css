@@ -1,19 +1,37 @@
-body {
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  text-align: center;
-  font-family: sans-serif;
-  font-size: calc(12px + 4vmax);
-  height: 100%;
-  background: var(--background);
-  position: fixed;
+:root {
+  color-scheme: light dark;
+  --background: white;
+  --settings-background: white;
+  --red: #aa0101;
+  --green: #085c08;
+  --gray0: lightgray;
+  --gray1: rgb(66, 66, 66);
+  --gray2: rgb(66, 66, 66);
+  --gray3: #303030;
+  --shadow: rgba(0, 0, 0, .1);
+
   --rotation: 0deg;
   --settingsY: 75%;
   --settingsX: -50%;
   --settings-sideways: 0;
   --settings-transition: transform .4s;
   --hacky-hack-hack: 0;
+  --dark-mode: 1;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: rgb(29, 29, 29);
+    --settings-background: rgb(12, 12, 12);
+    --red: #9c0202;
+    --green: #085c08;
+    --gray0: lightgray;
+    --gray1: rgb(97, 97, 97);
+    --gray2: rgb(102, 102, 102);
+    --gray3: #8f8f8f;
+    --shadow: rgba(0, 0, 0, 0);
+    --dark-mode: 0;
+  }
 }
 
 .light {
@@ -38,6 +56,18 @@ body {
   --gray2: rgb(102, 102, 102);
   --gray3: #8f8f8f;
   --shadow: rgba(0, 0, 0, 0);
+}
+
+body {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  font-family: sans-serif;
+  font-size: calc(12px + 4vmax);
+  height: 100%;
+  background: var(--background);
+  position: fixed;
 }
 
 hr {
@@ -180,6 +210,7 @@ hr {
   width: 45px;
   border-radius: 12.5px;
   background: var(--gray2);
+  transition: background .2s;
   cursor: pointer;
 }
 
