@@ -12,6 +12,10 @@ async function getMedia(constraints) {
 }
 getMedia({ audio: true });
 
+/* if (navigator.serviceWorker) {
+  navigator.serviceWorker.register('/tuner/sw.js', {scope: '/tuner/'});
+} */
+
 const fineTuneMarks = document.getElementById('fineTuneMarks');
 const justFrequency = document.getElementById('justFrequency');
 const noteDisplay = document.getElementById('noteDisplay');
@@ -93,8 +97,10 @@ window.addEventListener('load', () => {
   }
 }, false);
 
-//save the options object in localstorage
-window.addEventListener('beforeunload', () => {
+//save the options object in localstorage - ios doesn't support beforeunload
+let whichUnload = (navigator.userAgent.match(/iPad/i) || navigator.userAgent.match(/iPhone/i)) ? 'pagehide' : 'beforeunload';
+window.addEventListener(whichUnload, () => {
+  alert('unload')
   localStorage.setItem('options', JSON.stringify(options));
 }, false);
 
