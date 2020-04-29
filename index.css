@@ -11,7 +11,9 @@ body {
   --rotation: 0deg;
   --settingsY: 75%;
   --settingsX: -50%;
-  --settings-sideways: 1;
+  --settings-sideways: 0;
+  --settings-transition: transform .4s;
+  --hacky-hack-hack: 0;
 }
 
 .light {
@@ -124,7 +126,7 @@ hr {
   border-top-left-radius: 5px;
   padding: 10px;
   padding-top: 0;
-  transition: max-height .4s, transform .4s;
+  transition: var(--settings-transition);
   text-align: left;
   color: var(--gray1);
   height: min-content;
@@ -315,7 +317,7 @@ hr {
   body {
     --settingsX: -90.5%;
     --settingsY: -50%;
-    --settings-sideways: 0;
+    --settings-sideways: 1;
   }
   .showInput {
     font-size: calc(12px + .4vw);
@@ -332,6 +334,7 @@ hr {
     width: min-content;
     padding-bottom: 0;
     box-shadow: 10px -10px 20px var(--shadow), 10px 10px 20px var(--shadow);
+    min-width: var(--hacky-hack-hack);
   }
   #openSettings {
     text-orientation: sideways;
