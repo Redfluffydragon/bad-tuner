@@ -8,10 +8,11 @@
 		<link rel="manifest" href="manifest.json"/>
     <link rel="canonical" href="https://redfluffydragon.github.io/tuner/"/>
     <meta name="apple-mobile-web-app-capable" content="yes"/>
-		<link rel="icon" href="img/icon.png" type="img/png">
+		<link rel="icon" href="favicon-16x16.png" sizes="16x16" type="img/png">
+		<link rel="icon" href="favicon-32x32.png" sizes="32x32" type="img/png">
 		<meta name="description" content="A simple javascript web audio based chromatic tuner."/>
 		<script src="index.js" defer></script>
-		<link rel="apple-touch-icon" sizes="144x144" href="img/apple-touch-icon.png"/>
+		<link rel="apple-touch-icon" sizes="144x144" href="/apple-touch-icon.png"/>
 		<link href="splashscreens/iphone5_splash.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
 		<link href="splashscreens/iphone6_splash.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
 		<link href="splashscreens/iphoneplus_splash.png" media="(device-width: 621px) and (device-height: 1104px) and (-webkit-device-pixel-ratio: 3)" rel="apple-touch-startup-image" />
@@ -47,9 +48,9 @@
 						<input id="adjustSensitivity" class="slider" type="range" min="40" max="100" value="60">
 					</li>
 					<li title="About one degree each, only visual">
-						Tuning radius:
-						<input  id="showTuning" class="showInput" type="number" pattern="[0-9]*" min="0" max="15" value="2">
-						<input id="adjustTuning" class="slider" type="range" min="0" max="15" value="2">
+						Tuning radius (deg):
+						<input  id="showTuning" class="showInput" type="number" pattern="[0-9]*" min="-1" max="10" value="2">
+						<input id="adjustTuning" class="slider" type="range" min="-1" max="10" value="2">
 					</li>
 					<li title="To nearest tenth" class="optional">
 						<label>
