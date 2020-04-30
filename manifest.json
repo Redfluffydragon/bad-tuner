@@ -4,9 +4,9 @@
   "description": "A simple javascript web audio based chromatic tuner.",
   "icons": [
     {
-      "src": "img/icon.png",
+      "src": "/favicon-32x32.png",
       "type": "img/png",
-      "sizes": "64x64"
+      "sizes": "32x32"
     }
   ],
   "start_url": "index.html",
