@@ -2,16 +2,16 @@
 
 //ask for microphone use
 let analyser; //for audio analyser
-async function getMedia(constraints) {
+async function getAudio() {
   let stream = null;
   try {
-    stream = await navigator.mediaDevices.getUserMedia(constraints);
+    stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     handleSuccess(stream);
   } catch(err) {
     console.log(err);
   }
 }
-getMedia({ audio: true });
+getAudio();
 
 /* if (navigator.serviceWorker) {
   navigator.serviceWorker.register('/tuner/sw.js', {scope: '/tuner/'});
@@ -53,7 +53,7 @@ let options = JSON.parse(localStorage.getItem('options')) ||
   {
     darkMode: null,
     roundFreq: true,
-    fftSize: 14,
+    fftSize: 15,
     minDecibels: -60,
     tuning: 2,
     tickNum: 9,
@@ -273,7 +273,7 @@ adjustTicks.addEventListener('input', () => {
 
 moreSettingsCheck.addEventListener('input', () => {
   document.documentElement.style.setProperty('--more-settings-display', moreSettingsCheck.checked ? 'list-item' : 'none');
-  
+
   document.documentElement.style.setProperty('--make-line-up', moreSettingsCheck.checked ? 'right' : 'unset');
   
   options.moreSettings = moreSettingsCheck.checked;
@@ -292,7 +292,7 @@ function handleSuccess(stream) {
   audioCtx.createMediaStreamSource(stream).connect(analyser);
 
   let soundArray = new Uint8Array(analyser.frequencyBinCount); //make a Uint8Array to store the audio data, same length as number of bins
-
+  
   //recursive function to constantly get new audio data and display it
   function showFrequency() {
     requestAnimationFrame(showFrequency);
@@ -300,19 +300,20 @@ function handleSuccess(stream) {
     let frequency = soundArray.indexOf(Math.max(...soundArray))*audioCtx.sampleRate/analyser.fftSize; //get the loudest bin and map to Hz
     if (frequency !== 0) {
       if (options.roundFreq) frequency = frequency.toFixed(1);
-      justFrequency.textContent = frequency;
-      showNote(frequency);
-      let showFineTune = fineTune(frequency)*2*45; //max is about +-0.5, so scale to 45 deg each way
+      justFrequency.textContent = frequency; //show the frequency
+      showNote(frequency); //show the note the frequency corresponds to
+      let showFineTune = fineTune(frequency)*2*45; //max is about +-0.5, so scale to 45 deg both ways
       
-      if (Math.abs(showFineTune) < options.tuning) { //change to green if it's close enough - add setting for this?
+      if (Math.abs(showFineTune) < options.tuning) { //change to green if it's close enough
         noteDisplay.classList.replace('red', 'green');
       }
       else {
         noteDisplay.classList.replace('green', 'red');
       }
-      document.documentElement.style.setProperty('--rotation', `${showFineTune}deg`); //pass to css variable
+      document.documentElement.style.setProperty('--rotation', `${showFineTune}deg`); //pass rotation to css variable
     }
   }
+
   showFrequency();
 }
 
