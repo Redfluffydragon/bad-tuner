@@ -3,7 +3,7 @@
 	<head>
     <meta charset="utf-8"/>
 		<title>Tuner</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/> <!--, user-scalable=no-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no"/> <!--, user-scalable=no-->
 		<link rel="stylesheet" href="index.css">
 		<link rel="manifest" href="manifest.json"/>
     <link rel="canonical" href="https://redfluffydragon.github.io/tuner/"/>
@@ -41,32 +41,38 @@
 							<span class="checkmark"></span>
 						</label>
 					</li>
-					<li title="To nearest tenth">
+					<li title="reversed minimum decibels">
+						Sensitivity:
+						<input id="showSensitivity" class="showInput" type="number" pattern="[0-9]*" min="40" max="100" value="60">
+						<input id="adjustSensitivity" class="slider" type="range" min="40" max="100" value="60">
+					</li>
+					<li title="About one degree each, only visual">
+						Tuning radius:
+						<input  id="showTuning" class="showInput" type="number" pattern="[0-9]*" min="0" max="15" value="2">
+						<input id="adjustTuning" class="slider" type="range" min="0" max="15" value="2">
+					</li>
+					<li title="To nearest tenth" class="optional">
 						<label>
 							Round frequency:
 							<input id="freqCheck" type="checkbox" checked>
 							<span class="checkmark"></span>
 						</label>
 					</li>
-					<li title="May help with performance">
+					<li title="May help with performance" class="optional">
 						Frequency precision:
-						<input id="adjustPrecision" class="slider" type="range" min="11" max="15" value="14">
 						<input id="showPrecision" class="showInput" value="16384" readonly>
+						<input id="adjustPrecision" class="slider" type="range" min="11" max="15" value="14">
 					</li>
-					<li title="reversed minimum decibels">
-						Sensitivity:
-						<input id="adjustSensitivity" class="slider" type="range" min="40" max="100" value="60">
-						<input id="showSensitivity" class="showInput" type="number" pattern="[0-9]*" min="40" max="100" value="60">
-					</li>
-					<li title="About one degree each, only visual">
-						Tuning proximity:
-						<input id="adjustTuning" class="slider" type="range" min="0" max="15" value="2">
-						<input  id="showTuning" class="showInput" type="number" pattern="[0-9]*" min="0" max="15" value="2">
+					<li class="optional">
+						Number of ticks:
+						<input  id="showTicks" class="showInput"value="9" readonly>
+						<input id="adjustTicks" class="slider" type="range" min="7" max="15" value="9" step="2">
 					</li>
 					<li>
-						Number of ticks:
-						<input id="adjustTicks" class="slider" type="range" min="7" max="15" value="9" step="2">
-						<input  id="showTicks" class="showInput"value="9" readonly>
+						<label id="moreSettings">
+							<input id="moreSettingsCheck" type="checkbox">
+							<span id="moreLess"></span>
+						</label>
 					</li>
 					<li>
 						<a id="reloader" href="">Reload</a>

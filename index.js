@@ -1,10 +1,5 @@
 'use strict'
 
-window.onerror = e => {
-  alert(e);
-  e.preventDefault();
-}
-
 //ask for microphone use
 let analyser; //for audio analyser
 async function getMedia(constraints) {
@@ -13,7 +8,7 @@ async function getMedia(constraints) {
     stream = await navigator.mediaDevices.getUserMedia(constraints);
     handleSuccess(stream);
   } catch(err) {
-    alert(err); //for mobile debugging - not that helpful
+    console.log(err);
   }
 }
 getMedia({ audio: true });
@@ -47,6 +42,9 @@ const showTuning = document.getElementById('showTuning');
 const adjustTicks = document.getElementById('adjustTicks');
 const showTicks = document.getElementById('showTicks');
 
+const moreSettingsCheck = document.getElementById('moreSettingsCheck');
+const moreLess = document.getElementById('moreLess');
+
 //note names with html sharp and flat signs
 const notes = ['A', 'B&flat;', 'B', 'C', 'C&sharp;', 'D', 'E&flat;', 'E', 'F', 'F&sharp;', 'G', 'A&flat;'];
 
@@ -59,12 +57,14 @@ let options = JSON.parse(localStorage.getItem('options')) ||
     minDecibels: -60,
     tuning: 2,
     tickNum: 9,
+    moreSettings: false,
   };
 
 //standalone window or not
 let isInWebApp = (window.navigator.standalone == true) || (window.matchMedia('(display-mode: standalone)').matches);
 
 let darkMode = getComputedStyle(document.body).getPropertyValue('--dark-mode') == 0;
+
 window.matchMedia('(prefers-color-scheme: dark)').addListener(() => {
   document.body.classList = '';
   darkMode = getComputedStyle(document.body).getPropertyValue('--dark-mode') == 0;
@@ -79,18 +79,13 @@ let moveSettingsAxis;
 
 //get pixel values for where the settings drawer should be when closed
 const closedVals = {
-  X: () => - settings.offsetWidth + openSettings.offsetWidth,
-  Y: () => settings.offsetHeight - openSettings.offsetHeight + 1, //+1 is for ipads and similar screen ratios - don't know why it won't go down far enough there
+  X: () => - settings.offsetWidth + openSettings.offsetWidth - 1, //+-1 is to get the divider line off screen on certain screen ratios
+  Y: () => settings.offsetHeight - openSettings.offsetHeight + 1, 
 };
 
 //set up settings with correct values, generate tuning ticks, dark/light mode
 window.addEventListener('load', () => {
   changeTicks();
-
-  if (isInWebApp) document.documentElement.style.setProperty('--hacky-hack-hack', '381px'); //disgusting hack to make sure it's the right width when reloaded in landscape
-
-  moveSettingsAxis = getComputedStyle(document.documentElement).getPropertyValue('--settings-sideways') == 0 ? 'Y' : 'X';
-  document.documentElement.style.setProperty('--settings' + moveSettingsAxis, closedVals[moveSettingsAxis]() + 'px');
 
   freqCheck.checked = options.roundFreq;
   
@@ -103,13 +98,30 @@ window.addEventListener('load', () => {
   adjustTicks.value = options.tickNum;
   showTicks.value = options.tickNum;
 
-  if (options.darkMode === true) {
-    document.body.classList.add('dark');
+  if (options.darkMode !== null) { //if dark mode has been set manually, set everything according to that
+    if (options.darkMode === true) {
+      document.body.classList.add('dark');
+    }
+    else if (options.darkMode === false) {
+      document.body.classList.add('light');
+    }
+    darkModeCheck.checked = options.darkMode;
   }
-  else if (options.darkMode === false) {
-    document.body.classList.add('light');
+  else {
+    darkModeCheck.checked = darkMode; //else, make sure the checkbox reflects the auto value
   }
-  darkModeCheck.checked = options.darkMode;
+
+  if (options.moreSettings) {
+    document.documentElement.style.setProperty('--more-settings-display', 'list-item');
+    document.documentElement.style.setProperty('--make-line-up', 'right');
+
+    moreSettingsCheck.checked = options.moreSettings
+  }
+
+  if (isInWebApp && window.matchMedia('(orientation: landscape)')) document.documentElement.style.setProperty('--hacky-hack-hack', settings.offsetWidth + 'px'); //gross hack to make sure it's the right width when reloaded in landscape
+
+  moveSettingsAxis = getComputedStyle(document.documentElement).getPropertyValue('--settings-sideways') == 0 ? 'Y' : 'X';
+  document.documentElement.style.setProperty('--settings' + moveSettingsAxis, closedVals[moveSettingsAxis]() + 'px');
 }, false);
 
 //save the options object in localstorage - ios doesn't support beforeunload
@@ -160,14 +172,14 @@ settings.addEventListener('touchstart', e => {
     switchSettings = false;
     framePending = false;
     initialPos = {X: e.targetTouches[0].clientX, Y: e.targetTouches[0].clientY};
-    document.addEventListener('touchmove', swipeSettings, true);
+    document.addEventListener('touchmove', swipeSettings, {passive: true, useCapture: true});
 
     settings.addEventListener('touchend', () => { //add self-removing touchend listener
       document.documentElement.style.setProperty('--settings-transition', 'transform .4s'); //add transition back so it's smooth the rest of the way
       if (touchMoved) {
         moveSettings(!switchSettings);
       }
-      document.removeEventListener('touchmove', swipeSettings, true);
+      document.removeEventListener('touchmove', swipeSettings, {passive: true, useCapture: true});
     }, {useCapture: true, once: true});
   }
 }, true);
@@ -221,21 +233,50 @@ showSensitivity.addEventListener('input', () => {
   updateAnalyser();
 }, false);
 
+showSensitivity.addEventListener('focusout', () => {
+  showSensitivity.value = adjustSensitivity.value;
+}, false);
+
 adjustTuning.addEventListener('input', () => {
-  showTuning.value = adjustTuning.value;
+  if (parseInt(adjustTuning.value) === 0) {
+    showTuning.value = ''
+    showTuning.placeholder = 'OFF';
+  }
+  else {
+    showTuning.value = adjustTuning.value;
+  }
   options.tuning = adjustTuning.value;
 }, false);
 
 showTuning.addEventListener('input', () => {
+  showTuning.placeholder = '';
   showTuning.value = Math.max(Math.min(parseInt(showTuning.value), 15), 0);
   adjustTuning.value = showTuning.value;
   options.tuning = adjustTuning.value;
+}, false);
+
+showTuning.addEventListener('focusout', () => {
+  if (parseInt(adjustTuning.value) === 0) {
+    showTuning.value = ''
+    showTuning.placeholder = 'OFF';
+  }
+  else {
+    showTuning.value = adjustTuning.value;
+  }
 }, false);
 
 adjustTicks.addEventListener('input', () => {
   showTicks.value = adjustTicks.value;
   options.tickNum = adjustTicks.value;
   changeTicks();
+}, false);
+
+moreSettingsCheck.addEventListener('input', () => {
+  document.documentElement.style.setProperty('--more-settings-display', moreSettingsCheck.checked ? 'list-item' : 'none');
+  
+  document.documentElement.style.setProperty('--make-line-up', moreSettingsCheck.checked ? 'right' : 'unset');
+  
+  options.moreSettings = moreSettingsCheck.checked;
 }, false);
 
 //set up audio analyser and show frequency data
