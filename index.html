@@ -8,10 +8,12 @@
 		<link rel="manifest" href="manifest.json"/>
     <link rel="canonical" href="https://redfluffydragon.github.io/tuner/"/>
     <meta name="apple-mobile-web-app-capable" content="yes"/>
-		<link rel="icon" href="favicon-16x16.png" sizes="16x16" type="img/png">
-		<link rel="icon" href="favicon-32x32.png" sizes="32x32" type="img/png">
+		<!-- <link rel="icon" href="favicon-16x16.png" sizes="16x16" type="img/png"> -->
+		<!-- <link rel="icon" href="favicon-32x32.png" sizes="32x32" type="img/png"> -->
+		<link rel="icon" href="/tuner-icon.png" type="img/png">
 		<meta name="description" content="A simple javascript web audio based chromatic tuner."/>
 		<script src="index.js" defer></script>
+		<!-- <link rel="apple-touch-icon" sizes="144x144" href="/apple-touch-icon.png"/> -->
 		<link rel="apple-touch-icon" sizes="144x144" href="/apple-touch-icon.png"/>
 		<link href="splashscreens/iphone5_splash.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
 		<link href="splashscreens/iphone6_splash.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
@@ -42,7 +44,7 @@
 							<span class="checkmark"></span>
 						</label>
 					</li>
-					<li title="reversed minimum decibels">
+					<li title="Reversed minimum decibels">
 						Sensitivity:
 						<input id="showSensitivity" class="showInput" type="number" pattern="[0-9]*" min="40" max="100" value="60">
 						<input id="adjustSensitivity" class="slider" type="range" min="40" max="100" value="60">
