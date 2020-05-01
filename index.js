@@ -294,8 +294,21 @@ function showFrequency() {
   requestAnimationFrame(showFrequency); //run again
 
   analyser.getByteFrequencyData(soundArray); //get data into array
-  let frequency = soundArray.indexOf(Math.max(...soundArray))*audioCtx.sampleRate/analyser.fftSize; //get the loudest bin and map to Hz
-  if (frequency !== 0) { //if not silent, update stuff
+  let midBin = soundArray.indexOf(Math.max(...soundArray)); //get index of loudest bin
+
+  let finBin = interpolate(midBin);
+
+  let lastHarmonic = Math.round(finBin / 2); //should be next lowest harmonic - seems to want to read high (at least on piano) so try to go down
+
+  if (soundArray[lastHarmonic] - soundArray[midBin] > 0) {
+    finBin = interpolate(lastHarmonic);
+  }
+  // console.log(soundArray[Math.round(lastHarmonic)], soundArray[Math.round(finBin)]);
+
+
+  if (finBin > 0) { //if not silent, update stuff
+    let frequency = finBin*audioCtx.sampleRate/analyser.fftSize; //map the interpolated frequency bin to Hz
+    
     if (freqCheck.checked) { //if the round frequency checkbox is checked, round the frequency
       frequency = frequency.toFixed(1);
     }
@@ -307,7 +320,7 @@ function showFrequency() {
 
     //get the letter note and octave and show them
     let fixSteps = roundSteps < 0 ? notes.length + roundSteps%notes.length : roundSteps%notes.length; //if lower than A4, add notes.length to reverse the index (I think)
-    fixSteps = fixSteps === 12 ? 0 : fixSteps; //if it's another a it'll end up 12, which we need to be zero
+    fixSteps = fixSteps === 12 ? 0 : fixSteps; //if it's an A it'll end up 12, which we need to be zero
     let tempNote = notes[fixSteps]; //get the string from notes
 
     noteLetter.textContent = tempNote.charAt(0); //the first one is the letter
@@ -324,6 +337,12 @@ function showFrequency() {
     }
     document.documentElement.style.setProperty('--rotation', `${showFineTune}deg`); //pass rotation to css variable
   }
+}
+
+//quadratic/parabolic interpolation algorithm
+function interpolate(bin) {
+  let interpolated = bin + (soundArray[bin+1] - soundArray[bin-1]) / (2 * (2 * soundArray[bin] - soundArray[bin-1] - soundArray[bin+1]))
+  return interpolated === Infinity ? 0 : interpolated;
 }
 
 //for moving the settings in and out
