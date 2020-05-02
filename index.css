@@ -294,7 +294,7 @@ a {
   content: "";
   position: absolute;
   top: 0.35em;
-  right: -.8em;
+  right: -0.8em;
   height: 0.4em;
   width: 0.4em;
   border: solid var(--gray1);
