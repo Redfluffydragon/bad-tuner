@@ -24,7 +24,7 @@ self.addEventListener('install', e => {
     caches.open(CACHE_NAME).then(cache => {
       return cache.addAll(URLS);
     })
-  )
+  );
 }, false);
 
 self.addEventListener('activate', e => {
@@ -37,7 +37,7 @@ self.addEventListener('activate', e => {
 
       return Promise.all(keyList.map((key, i) => {
         if (cacheWhitelist.indexOf(key) === -1) {
-          return caches.delete(keyList[parseInt(i)]);
+          return caches.delete(keyList[parseInt(i, 10)]);
         }
       }));
 
