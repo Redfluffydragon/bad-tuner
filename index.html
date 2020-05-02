@@ -3,7 +3,7 @@
 	<head>
     <meta charset="utf-8"/>
 		<title>Tuner</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no"/> <!--, user-scalable=no-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no"/>
 		<link rel="stylesheet" href="index.css">
 		<link rel="manifest" href="manifest.json"/>
     <link rel="canonical" href="https://redfluffydragon.github.io/tuner/"/>
@@ -24,60 +24,60 @@
 		<link href="splashscreens/ipadpro2_splash.png" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
 	</head>
 	<body>
-			<div id="fineTuner">
-				<div id="fineTunePointer"></div>
-				<div id="fineTuneMarks"></div>
-			</div>
-			<h1 id="noteDisplay" class="red"><span id="noteLetter">A</span><span id="accidental"></span><span id="octave">4</span></h1>
-			<h1 id="frequencyDisplay"><span id="justFrequency">440.0</span><span id="hz">Hz</span></h1>
-			<div id="settings">
-				<div id="openSettings">Settings</div>
-				<hr>
-				<ul id="settingsList">
-					<li>
-						<label>
-							Dark mode:
-							<input id="darkModeCheck" type="checkbox">
-							<span class="checkmark"></span>
-						</label>
-					</li>
-					<li title="Reversed minimum decibels">
-						Sensitivity:
-						<input id="showSensitivity" class="showInput" type="number" pattern="[0-9]*" min="40" max="100" value="60">
-						<input id="adjustSensitivity" class="slider" type="range" min="40" max="100" value="60">
-					</li>
-					<li title="About one degree each, only visual">
-						Tuning radius (deg):
-						<input  id="showTuning" class="showInput" type="number" pattern="[0-9]*" min="-1" max="10" value="2">
-						<input id="adjustTuning" class="slider" type="range" min="-1" max="10" value="2">
-					</li>
-					<li title="To nearest tenth" class="optional">
-						<label>
-							Round frequency:
-							<input id="freqCheck" type="checkbox" checked>
-							<span class="checkmark"></span>
-						</label>
-					</li>
-					<li title="May help with performance" class="optional">
-						Frequency precision:
-						<input id="showPrecision" class="showInput" value="32768" readonly>
-						<input id="adjustPrecision" class="slider" type="range" min="11" max="15" value="15">
-					</li>
-					<li class="optional">
-						Number of ticks:
-						<input  id="showTicks" class="showInput"value="9" readonly>
-						<input id="adjustTicks" class="slider" type="range" min="7" max="15" value="9" step="2">
-					</li>
-					<li>
-						<label id="moreSettings">
-							<input id="moreSettingsCheck" type="checkbox">
-							<span id="moreLess"></span>
-						</label>
-					</li>
-					<li>
-						<a id="reloader" href="">Reload</a>
-					</li>
-				</ul>
-			</div>
+		<div id="fineTuner">
+			<div id="fineTunePointer"></div>
+			<div id="fineTuneMarks"></div>
+		</div>
+		<h1 id="noteDisplay" class="red"><span id="noteLetter">A</span><span id="accidental"></span><span id="octave">4</span></h1>
+		<h1 id="frequencyDisplay"><span id="justFrequency">440.0</span><span id="hz">Hz</span></h1>
+		<div id="settings">
+			<div id="openSettings">Settings</div>
+			<hr>
+			<ul id="settingsList">
+				<li>
+					<label>
+						Dark mode:
+						<input id="darkModeCheck" class="checkbox" type="checkbox">
+						<span class="checkmark"></span>
+					</label>
+				</li>
+				<li title="Reversed minimum decibels">
+					Sensitivity:
+					<input id="showSensitivity" class="showInput" type="number" pattern="[0-9]*" min="40" max="100" value="60">
+					<input id="adjustSensitivity" class="slider" type="range" min="40" max="100" value="60">
+				</li>
+				<li title="About one degree each, only visual">
+					Tuning radius (deg):
+					<input  id="showTuning" class="showInput" type="number" pattern="[0-9]*" min="-1" max="10" value="2">
+					<input id="adjustTuning" class="slider" type="range" min="-1" max="10" value="2">
+				</li>
+				<li title="To nearest tenth" class="optional">
+					<label>
+						Round frequency:
+						<input id="freqCheck" class="checkbox" type="checkbox" checked>
+						<span class="checkmark"></span>
+					</label>
+				</li>
+				<li title="May help with performance" class="optional">
+					Frequency precision:
+					<input id="showPrecision" class="showInput" value="32768" readonly>
+					<input id="adjustPrecision" class="slider" type="range" min="11" max="15" value="15">
+				</li>
+				<li class="optional">
+					Number of ticks:
+					<input  id="showTicks" class="showInput"value="9" readonly>
+					<input id="adjustTicks" class="slider" type="range" min="7" max="15" value="9" step="2">
+				</li>
+				<li>
+					<label id="moreSettings">
+						<input id="moreSettingsCheck" class="checkbox" type="checkbox">
+						<span id="moreLess"></span>
+					</label>
+				</li>
+				<li>
+					<a id="reloader" href="">Reload</a>
+				</li>
+			</ul>
+		</div>
 	</body>
 </html>
