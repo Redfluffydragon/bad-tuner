@@ -10,6 +10,7 @@ getAudio();
   navigator.serviceWorker.register('/tuner/sw.js', {scope: '/tuner/'});
 } */
 
+const fineTunePointer = document.getElementById('fineTunePointer');
 const fineTuneMarks = document.getElementById('fineTuneMarks');
 const justFrequency = document.getElementById('justFrequency');
 const noteDisplay = document.getElementById('noteDisplay');
@@ -19,6 +20,8 @@ const octave = document.getElementById('octave');
 
 const settings = document.getElementById('settings');
 const openSettings = document.getElementById('openSettings');
+
+const darkModeCheck = document.getElementById('darkModeCheck');
 
 const freqCheck = document.getElementById('freqCheck');
 
@@ -59,7 +62,7 @@ if (!sameKeys(startOptions, options)) {
 let settingsOpen = false; //settings open or not
 
 //to move the settings div in either the x or y dimension depending on a css variable set using media queries (value passed in load and resize listeners)
-const moveSettingsAxis = () => parseInt(getComputedStyle(document.documentElement).getPropertyValue('--settings-sideways')) === 0 ? 'Y' : 'X';
+const moveSettingsAxis = () => parseInt(getComputedStyle(document.documentElement).getPropertyValue('--settings-sideways'), 10) === 0 ? 'Y' : 'X';
 
 //get pixel values for where the settings drawer should be when closed
 const closedVals = {
@@ -97,7 +100,9 @@ window.addEventListener('load', () => {
 
   adjustTuning.value = options.tuning;
   showTuning.value = options.tuning === -1 ? '' : options.tuning;
-  if (options.tuning === -1) showTuning.placeholder = 'OFF'
+  if (options.tuning === -1) {
+    showTuning.placeholder = 'OFF';
+  }
 
   if (options.darkMode !== null) { //if dark mode has been set manually, set everything according to that
     document.body.classList.add(options.darkMode ? 'dark' : 'light');
@@ -111,7 +116,7 @@ window.addEventListener('load', () => {
     document.documentElement.style.setProperty('--more-settings-display', 'list-item');
     document.documentElement.style.setProperty('--make-line-up', 'right');
 
-    moreSettingsCheck.checked = options.moreSettings
+    moreSettingsCheck.checked = options.moreSettings;
   }
 
   if (isInWebApp && window.matchMedia('(orientation: landscape)')) { //gross hack to make sure it's the right width when reloaded in landscape
@@ -201,7 +206,7 @@ darkModeCheck.addEventListener('input', () => {
 
 adjustPrecision.addEventListener('input', () => {
   showPrecision.value = Math.pow(2, adjustPrecision.value);
-  options.fftSize = parseInt(adjustPrecision.value);
+  options.fftSize = parseInt(adjustPrecision.value, 10);
   updateAnalyser();
 }, false);
 
@@ -213,13 +218,13 @@ adjustSensitivity.addEventListener('input', () => {
 
 showSensitivity.addEventListener('input', () => {
   if (showSensitivity.value.length === 2) {
-    showSensitivity.value = Math.max(parseInt(showSensitivity.value), 40);
+    showSensitivity.value = Math.max(parseInt(showSensitivity.value, 10), 40);
   }
   else if (showSensitivity.value.length > 2) {
     showSensitivity.value = Math.min(parseInt(showSensitivity.value), 100);
   }
   adjustSensitivity.value = showSensitivity.value;
-  options.minDecibels = parseInt(adjustSensitivity.value)*-1;
+  options.minDecibels = parseInt(adjustSensitivity.value, 10)*-1;
   updateAnalyser();
 }, false);
 
@@ -229,24 +234,24 @@ showSensitivity.addEventListener('focusout', () => {
 
 adjustTuning.addEventListener('input', () => {
   tuningOnOff();
-  options.tuning = parseInt(adjustTuning.value);
+  options.tuning = parseInt(adjustTuning.value, 10);
 }, false);
 
 showTuning.addEventListener('input', () => {
-  showTuning.value = Math.max(Math.min(parseInt(showTuning.value), 10), -1);
+  showTuning.value = Math.max(Math.min(parseInt(showTuning.value, 10), 10), -1);
 
   adjustTuning.value = showTuning.value;
-  options.tuning = parseInt(adjustTuning.value);
+  options.tuning = parseInt(adjustTuning.value, 10);
 
-  showTuning.placeholder = parseInt(showTuning.value) === -1 ?'OFF' : '';
-  if (parseInt(showTuning.value) === -1) showTuning.value = '';
+  showTuning.placeholder = parseInt(showTuning.value, 10) === -1 ?'OFF' : '';
+  if (parseInt(showTuning.value, 10) === -1) showTuning.value = '';
 }, false);
 
 showTuning.addEventListener('focusout', tuningOnOff, false);
 
 adjustTicks.addEventListener('input', () => {
   showTicks.value = adjustTicks.value;
-  options.tickNum = parseInt(adjustTicks.value);
+  options.tickNum = parseInt(adjustTicks.value, 10);
   changeTicks();
 }, false);
 
@@ -260,7 +265,8 @@ moreSettingsCheck.addEventListener('input', () => {
 async function getAudio() {
   try {
     handleSuccess(await navigator.mediaDevices.getUserMedia({ audio: true })); //await stuff evaluates to an audio stream if successful
-  } catch(err) {
+  }
+  catch(err) {
     console.warn(err);
   }
 }
@@ -289,6 +295,9 @@ function updateAnalyser() {
   analyser.minDecibels = options.minDecibels; //adjust lower decibel cutoff (sensitivity, basically) more negative = more sensitive
 }
 
+//barycentric interpolation seems to be a little more accurate than quadratic, and doesn't return nasty values
+const interpolate = bin => bin + (soundArray[bin+1] - soundArray[bin-1]) / (soundArray[bin] + soundArray[bin-1] + soundArray[bin+1]);
+
 //recursive function to constantly get new audio data and display it
 function showFrequency() {
   requestAnimationFrame(showFrequency); //run again
@@ -296,15 +305,23 @@ function showFrequency() {
   analyser.getByteFrequencyData(soundArray); //get data into array
   let midBin = soundArray.indexOf(Math.max(...soundArray)); //get index of loudest bin
 
-  let finBin = interpolate(midBin);
+  let finBin; // = interpolate(midBin); //interpolate to get more accurate frequency
+  let nextHarmonic = Math.round(midBin * 2);
+  let lastHarmonic = Math.round(midBin / 2); //should be next lowest harmonic - seems to want to read high (at least with piano harmonics) so try to go down
+  // if (soundArray[midBin] > 150)
+  console.log(soundArray[lastHarmonic], soundArray[midBin], midBin);
 
-  let lastHarmonic = Math.round(finBin / 2); //should be next lowest harmonic - seems to want to read high (at least on piano) so try to go down
-
-  if (soundArray[lastHarmonic] - soundArray[midBin] > 0) {
+  //the lower the note is, the more harmonics you get - try to compensate somehow - increase the 25 as the frequencies go down
+  //25 around octaves 4-5, larger for lower octaves - linear? quadratic?
+  //is the next harmonic up needed?
+  //5/44 * midBin + 59
+  if ((soundArray[midBin] - soundArray[lastHarmonic]) < (-0.33 * midBin + 124) && soundArray[nextHarmonic] < soundArray[midBin] * 0.7) { //if the next lowest harmonic is close enough, switch to that
     finBin = interpolate(lastHarmonic);
+    // console.log('swapped');
   }
-  // console.log(soundArray[Math.round(lastHarmonic)], soundArray[Math.round(finBin)]);
-
+  else {
+    finBin = interpolate(midBin);
+  }
 
   if (finBin > 0) { //if not silent, update stuff
     let frequency = finBin*audioCtx.sampleRate/analyser.fftSize; //map the interpolated frequency bin to Hz
@@ -314,7 +331,7 @@ function showFrequency() {
     }
     justFrequency.textContent = frequency; //show the frequency
 
-   //take log base 2^(1/12) of the ratio between the current frequency and A4 to find the number of half-steps away from A4 - big decimal is approx. ln(2^(1/12))
+    //take log base 2^(1/12) of the ratio between the current frequency and A4 to find the number of half-steps away from A4 - big decimal is approx. ln(2^(1/12))
     let steps = Math.log(frequency/440)/0.05776226504666215;
     let roundSteps = Math.round(steps);
 
@@ -327,7 +344,7 @@ function showFrequency() {
     accidental.innerHTML = tempNote.length > 1 ? tempNote.slice(1) : ''; //then any accidentals
     octave.textContent = Math.max(Math.floor((roundSteps+9)/notes.length)+4, 0); //have to add nine so it changes the octave on C instead of A
 
-    let showFineTune = (steps - roundSteps) * 2 * 45; //max is about +-0.5, so scale to 45 deg both ways
+    let showFineTune = (steps - roundSteps) * 90; //max is about +-0.5, so scale to 45 deg both ways
     
     if (Math.abs(showFineTune) <= options.tuning) { //change to green if it's close enough
       noteDisplay.classList.replace('red', 'green');
@@ -335,14 +352,8 @@ function showFrequency() {
     else {
       noteDisplay.classList.replace('green', 'red');
     }
-    document.documentElement.style.setProperty('--rotation', `${showFineTune}deg`); //pass rotation to css variable
+    fineTunePointer.style.transform = `rotate(${showFineTune}deg)`; //rotate the pointer to the right angle
   }
-}
-
-//quadratic/parabolic interpolation algorithm
-function interpolate(bin) {
-  let interpolated = bin + (soundArray[bin+1] - soundArray[bin-1]) / (2 * (2 * soundArray[bin] - soundArray[bin-1] - soundArray[bin+1]))
-  return interpolated === Infinity ? 0 : interpolated;
 }
 
 //for moving the settings in and out
@@ -384,7 +395,7 @@ function changeTicks() {
 
 //if the tuning radius is negative one, it's off, so set it to say that (have to use placeholder 'cause it's a number input)
 function tuningOnOff() {
-  if (parseInt(adjustTuning.value) === -1) {
+  if (parseInt(adjustTuning.value, 10) === -1) {
     showTuning.value = ''
     showTuning.placeholder = 'OFF';
   }
