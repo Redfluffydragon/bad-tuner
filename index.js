@@ -39,8 +39,8 @@ const showTicks = document.getElementById('showTicks');
 
 const moreSettingsCheck = document.getElementById('moreSettingsCheck');
 
-//note names with html sharp and flat signs
-const notes = ['A', 'B&flat;', 'B', 'C', 'C&sharp;', 'D', 'E&flat;', 'E', 'F', 'F&sharp;', 'G', 'A&flat;'];
+//note names with sharp and flat signs
+const notes = ['A', 'B♭', 'B', 'C', 'C♯', 'D', 'E♭', 'E', 'F', 'F♯', 'G', 'A♭'];
 
 //for storing settings
 const startOptions = {
@@ -71,7 +71,7 @@ const closedVals = {
 };
 
 //standalone window or not
-let isInWebApp = (window.navigator.standalone == true) || (window.matchMedia('(display-mode: standalone)').matches);
+let isInWebApp = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
 
 //system dark more detection
 const darkMode = () => window.matchMedia('(prefers-color-scheme: dark)');
@@ -140,7 +140,7 @@ window.addEventListener('resize', () => {
   moveSettings(true);
   if (isInWebApp) {
     document.documentElement.style.setProperty('--hacky-hack-hack', '0');
-    window.setTimeout(() => {moveSettings(true)}, 50); //disgusting hack to get rid of like 2 pixels when going from portrait to landscape in standalone mode
+    window.setTimeout(() => { moveSettings(true); }, 50); //disgusting hack to get rid of like 2 pixels when going from portrait to landscape in standalone mode
   }
 }, false);
 
@@ -221,7 +221,7 @@ showSensitivity.addEventListener('input', () => {
     showSensitivity.value = Math.max(parseInt(showSensitivity.value, 10), 40);
   }
   else if (showSensitivity.value.length > 2) {
-    showSensitivity.value = Math.min(parseInt(showSensitivity.value), 100);
+    showSensitivity.value = Math.min(parseInt(showSensitivity.value, 10), 100);
   }
   adjustSensitivity.value = showSensitivity.value;
   options.minDecibels = parseInt(adjustSensitivity.value, 10)*-1;
@@ -244,7 +244,9 @@ showTuning.addEventListener('input', () => {
   options.tuning = parseInt(adjustTuning.value, 10);
 
   showTuning.placeholder = parseInt(showTuning.value, 10) === -1 ?'OFF' : '';
-  if (parseInt(showTuning.value, 10) === -1) showTuning.value = '';
+  if (parseInt(showTuning.value, 10) === -1) {
+    showTuning.value = '';
+  }
 }, false);
 
 showTuning.addEventListener('focusout', tuningOnOff, false);
@@ -263,12 +265,7 @@ moreSettingsCheck.addEventListener('input', () => {
 }, false);
 
 async function getAudio() {
-  try {
-    handleSuccess(await navigator.mediaDevices.getUserMedia({ audio: true })); //await stuff evaluates to an audio stream if successful
-  }
-  catch(err) {
-    console.warn(err);
-  }
+  handleSuccess(await navigator.mediaDevices.getUserMedia({ audio: true })); //await stuff evaluates to an audio stream if successful
 }
 
 //set up audio analyser and show frequency data
@@ -309,7 +306,7 @@ function showFrequency() {
   let nextHarmonic = Math.round(midBin * 2);
   let lastHarmonic = Math.round(midBin / 2); //should be next lowest harmonic - seems to want to read high (at least with piano harmonics) so try to go down
   // if (soundArray[midBin] > 150)
-  console.log(soundArray[lastHarmonic], soundArray[midBin], midBin);
+  // console.log(soundArray[lastHarmonic], soundArray[midBin], midBin);
 
   //the lower the note is, the more harmonics you get - try to compensate somehow - increase the 25 as the frequencies go down
   //25 around octaves 4-5, larger for lower octaves - linear? quadratic?
@@ -341,7 +338,7 @@ function showFrequency() {
     let tempNote = notes[fixSteps]; //get the string from notes
 
     noteLetter.textContent = tempNote.charAt(0); //the first one is the letter
-    accidental.innerHTML = tempNote.length > 1 ? tempNote.slice(1) : ''; //then any accidentals
+    accidental.textContent = tempNote.length > 1 ? tempNote.charAt(1) : ''; //then any accidentals
     octave.textContent = Math.max(Math.floor((roundSteps+9)/notes.length)+4, 0); //have to add nine so it changes the octave on C instead of A
 
     let showFineTune = (steps - roundSteps) * 90; //max is about +-0.5, so scale to 45 deg both ways
@@ -396,7 +393,7 @@ function changeTicks() {
 //if the tuning radius is negative one, it's off, so set it to say that (have to use placeholder 'cause it's a number input)
 function tuningOnOff() {
   if (parseInt(adjustTuning.value, 10) === -1) {
-    showTuning.value = ''
+    showTuning.value = '';
     showTuning.placeholder = 'OFF';
   }
   else {
