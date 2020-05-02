@@ -4,19 +4,17 @@
   --settings-background: white;
   --red: #aa0101;
   --green: #085c08;
-  --gray0: lightgray;
   --gray1: rgb(66, 66, 66);
   --gray2: rgb(66, 66, 66);
   --gray3: #303030;
-  --shadow: rgba(0, 0, 0, .1);
+  --shadow: rgba(0, 0, 0, 0.1);
+  --img-invert: 20%;
 
-  --rotation: 0deg;
   --settingsY: 75%;
   --settingsX: -50%;
   --settings-sideways: 0;
-  --settings-transition: transform .4s;
+  --settings-transition: transform 0.4s;
   --hacky-hack-hack: 0;
-  --img-invert: 20%;
   --more-settings-display: none;
   --make-line-up: unset;
 }
@@ -27,7 +25,6 @@
     --settings-background: rgb(12, 12, 12);
     --red: #9c0202;
     --green: #085c08;
-    --gray0: lightgray;
     --gray1: rgb(97, 97, 97);
     --gray2: rgb(102, 102, 102);
     --gray3: #8f8f8f;
@@ -41,11 +38,10 @@
   --settings-background: white;
   --red: #aa0101;
   --green: #085c08;
-  --gray0: lightgray;
   --gray1: rgb(66, 66, 66);
   --gray2: rgb(66, 66, 66);
   --gray3: #303030;
-  --shadow: rgba(0, 0, 0, .1);
+  --shadow: rgba(0, 0, 0, 0.1);
   --img-invert: 20%;
 }
 
@@ -54,7 +50,6 @@
   --settings-background: rgb(12, 12, 12);
   --red: #9c0202;
   --green: #085c08;
-  --gray0: lightgray;
   --gray1: rgb(97, 97, 97);
   --gray2: rgb(102, 102, 102);
   --gray3: #8f8f8f;
@@ -123,8 +118,7 @@ a {
   height: 35vh;
   background: var(--gray3);
   transform-origin: 50% 100%;
-  transform: rotate(var(--rotation));
-  transition: transform .3s;
+  transition: transform 0.3s;
 }
 
 #fineTuneMarks {
@@ -150,7 +144,7 @@ a {
 }
 
 #settings {
-  font-size: calc(10px + .7vw);
+  font-size: calc(10px + 0.7vw);
   position: fixed;
   display: inline-block;
   display: flex;
@@ -179,7 +173,7 @@ a {
   padding: 10px;
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
-  font-size: calc(12px + .7vw);
+  font-size: calc(12px + 0.7vw);
   font-weight: bold;
 }
 
@@ -195,20 +189,8 @@ a {
 
 #settingsList li {
   margin: 12px auto;
-  margin-right: 110px;
-}
-
-#settingsList li input[type=range] {
-  position: absolute;
-  right: -2px;
-}
-
-#settingsList li input[type=checkbox] {
-  position: absolute;
-  opacity: 0;
-  cursor: pointer;
-  width: 0;
-  height: 0;
+  padding-right: 110px;
+  position: relative;
 }
 
 .checkmark {
@@ -219,12 +201,8 @@ a {
   width: 45px;
   border-radius: 12.5px;
   background: var(--gray2);
-  transition: background .2s;
+  transition: background 0.2s;
   cursor: pointer;
-}
-
-#settingsList li input[type=checkbox]:checked ~ .checkmark {
-  background: var(--red);
 }
 
 .checkmark:after {
@@ -236,10 +214,22 @@ a {
   height: 20px;
   border-radius: 50%;
   background: var(--settings-background);
-  transition: transform .3s;
+  transition: transform 0.3s;
 }
 
-#settingsList li input[type=checkbox]:checked ~ .checkmark:after {
+.checkbox {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  width: 0;
+  height: 0;
+}
+
+.checkbox:checked ~ .checkmark {
+  background: var(--red);
+}
+
+.checkbox:checked ~ .checkmark:after {
   transform: translateX(20px);
 }
 
@@ -247,27 +237,29 @@ a {
   -webkit-appearance: none;
   width: 100px;
   height: 7px;
-  border-radius: 3.5px;  
+  border-radius: 3.5px;
   background: var(--gray2);
   outline: none;
-  vertical-align: middle;
   display: inline-block;
   margin: 5px;
+  position: absolute;
+  right: -2px;
+  top: 3.5px;
 }
 
 .slider::-webkit-slider-thumb {
-  -webkit-appearance: none; 
+  -webkit-appearance: none;
   appearance: none;
-  width: 17px; 
-  height: 17px; 
+  width: 17px;
+  height: 17px;
   background: var(--red);
-  cursor: pointer; 
+  cursor: pointer;
   border-radius: 50%;
   border: none;
 }
 
 .showInput {
-  border: .5px solid var(--gray2);
+  border: 0.5px solid var(--gray2);
   border-radius: 4px;
   padding: 3px;
   width: 50px;
@@ -275,7 +267,7 @@ a {
   color: var(--gray2);
   position: relative;
   float: right;
-  font-size: calc(12px + .4vw);
+  font-size: calc(12px + 0.4vw);
 }
 
 #showPrecision {
@@ -301,15 +293,15 @@ a {
 #moreLess:after {
   content: "";
   position: absolute;
-  top: .35em;
+  top: 0.35em;
   right: -.8em;
-  height: .4em;
-  width: .4em;
+  height: 0.4em;
+  width: 0.4em;
   border: solid var(--gray1);
   border-width: 0 1.7px 1.7px 0;
   transform: rotate(45deg);
   transform-origin: 65% 65%;
-  transition: transform .3s;
+  transition: transform 0.3s;
 }
 
 #moreSettings {
@@ -344,18 +336,23 @@ a {
   #noteDisplay {
     margin-top: 30px;
   }
+
   #frequencyDisplay {
     font-size: calc(25px + 8vmin);
   }
+
   #accidental {
     font-size: calc(19px + 8vmin);
   }
+
   #octave {
     font-size: calc(18px + 8vmin);
   }
+
   #settings {
     font-size: calc(12px + 1vw);
   }
+
   body {
     font-size: calc(25px + 10vmin);
   }
@@ -365,25 +362,31 @@ a {
   #settings {
     max-width: 90vw;
   }
+
   .showInput {
     width: 36px;
-    font-size: calc(12px + .4vw);
+    font-size: calc(12px + 0.4vw);
     text-align: center;
   }
+
   #settingsList li {
     margin-top: 18px;
-    font-size: calc(12px + .5vw);
+    font-size: calc(12px + 0.5vw);
   }
+
   #frequencyDisplay {
     font-size: calc(12px + 6vmin);
     margin-top: 0;
   }
+
   #noteDisplay {
     margin-top: 15px;
   }
+
   #reloader {
     font-size: 90%;
   }
+
   hr {
     top: 2px;
   }
@@ -391,12 +394,14 @@ a {
 
 @media screen and (max-height: 400px) {
   #noteDisplay {
-    margin-top: .5vh;
+    margin-top: 0.5vh;
     margin-bottom: 0;
   }
+
   #fineTuner {
     margin-top: calc(12px + 1vh);
   }
+
   #frequencyDisplay {
     margin-top: 0;
   }
@@ -408,10 +413,12 @@ a {
     --settingsY: -50%;
     --settings-sideways: 1;
   }
+
   .showInput {
-    font-size: calc(12px + .4vw);
+    font-size: calc(12px + 0.4vw);
     text-align: center;
   }
+
   #settings {
     margin-left: 0;
     transform: translate(var(--settingsX), var(--settingsY));
@@ -425,6 +432,7 @@ a {
     box-shadow: 10px -10px 20px var(--shadow), 10px 10px 20px var(--shadow);
     min-width: var(--hacky-hack-hack);
   }
+
   #openSettings {
     text-orientation: sideways;
     writing-mode: vertical-lr;
@@ -433,9 +441,11 @@ a {
     border-top-left-radius: 0;
     border-bottom-right-radius: 5px;
   }
+
   #frequencyDisplay {
     font-size: calc(12px + 6vmin);
   }
+
   hr {
     right: -10px;
     display: inline-block;
