@@ -265,17 +265,17 @@ moreSettingsCheck.addEventListener('input', () => {
 }, false);
 
 async function getAudio() {
-  handleSuccess(await navigator.mediaDevices.getUserMedia({ audio: true })); //await stuff evaluates to an audio stream if successful
+  makeAnalyser(await navigator.mediaDevices.getUserMedia({ audio: true })); //await stuff evaluates to an audio stream if successful
 }
 
 //set up audio analyser and show frequency data
-function handleSuccess(stream) {
+function makeAnalyser(stream) {
   //get the audio context and create an analyser
   audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   
   analyser = audioCtx.createAnalyser();
 
-  //set some properties according to options
+  //set fft size and minDecibels properties according to options
   updateAnalyser();
 
   //make an audio source and connect it to the analyser
@@ -301,27 +301,21 @@ function showFrequency() {
 
   analyser.getByteFrequencyData(soundArray); //get data into array
   let midBin = soundArray.indexOf(Math.max(...soundArray)); //get index of loudest bin
-
-  let finBin; // = interpolate(midBin); //interpolate to get more accurate frequency
-  let nextHarmonic = Math.round(midBin * 2);
-  let lastHarmonic = Math.round(midBin / 2); //should be next lowest harmonic - seems to want to read high (at least with piano harmonics) so try to go down
-  // if (soundArray[midBin] > 150)
-  // console.log(soundArray[lastHarmonic], soundArray[midBin], midBin);
-
-  //the lower the note is, the more harmonics you get - try to compensate somehow - increase the 25 as the frequencies go down
-  //25 around octaves 4-5, larger for lower octaves - linear? quadratic?
-  //is the next harmonic up needed?
-  //5/44 * midBin + 59
-  if ((soundArray[midBin] - soundArray[lastHarmonic]) < (-0.33 * midBin + 124) && soundArray[nextHarmonic] < soundArray[midBin] * 0.7) { //if the next lowest harmonic is close enough, switch to that
+  
+  let finBin; //for the final bin (after the logic)
+  let lastHarmonic = Math.round(midBin/2); //the next lowest harmonic - wants to read high, so try to go down
+  
+  //check the volume difference vs an experimentally determined constant minus the midBin volume: if the volume diff is small enough, switch down an octave
+  //seems to work decently well, actually. Might have to add in aother factor that takes into account the frequency, as lower frequencies generate more and higher harmonics
+  if ((soundArray[midBin] - soundArray[lastHarmonic]) < Math.max(280 - soundArray[midBin], 60)) { //if the next lowest harmonic is close enough, switch to that
     finBin = interpolate(lastHarmonic);
-    // console.log('swapped');
   }
   else {
     finBin = interpolate(midBin);
   }
 
   if (finBin > 0) { //if not silent, update stuff
-    let frequency = finBin*audioCtx.sampleRate/analyser.fftSize; //map the interpolated frequency bin to Hz
+    let frequency = finBin*audioCtx.sampleRate/analyser.fftSize; //map the final bin to Hz
     
     if (freqCheck.checked) { //if the round frequency checkbox is checked, round the frequency
       frequency = frequency.toFixed(1);
@@ -339,8 +333,11 @@ function showFrequency() {
 
     noteLetter.textContent = tempNote.charAt(0); //the first one is the letter
     accidental.textContent = tempNote.length > 1 ? tempNote.charAt(1) : ''; //then any accidentals
-    octave.textContent = Math.max(Math.floor((roundSteps+9)/notes.length)+4, 0); //have to add nine so it changes the octave on C instead of A
+    let tempOctave =  Math.max(Math.floor((roundSteps + 9)/notes.length) + 4, 0);
+    octave.textContent = tempOctave //have to add nine so it changes the octave on C instead of A, and limit it to zero 'cause negative octaves don't exist
 
+    // console.log((soundArray[midBin] - soundArray[lastHarmonic]), 280 - soundArray[midBin], midBin, tempNote+tempOctave); //for testing
+    
     let showFineTune = (steps - roundSteps) * 90; //max is about +-0.5, so scale to 45 deg both ways
     
     if (Math.abs(showFineTune) <= options.tuning) { //change to green if it's close enough
@@ -373,7 +370,7 @@ function moveSettings(resizing=false) {
 function sameKeys(...objects) {
   const getKeys = objects.reduce((keys, object) => keys.concat(Object.keys(object)), []); //get the keys of all objects and put in an array
   const oneOfEach = new Set(getKeys); //put all the keys in a set
-  return objects.every(object => oneOfEach.size === Object.keys(object).length);
+  return objects.every(object => oneOfEach.size === Object.keys(object).length); //check if the set has the same length as the objects' keys
 }
 
 //change the number of tuning ticks there are
