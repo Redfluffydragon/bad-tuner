@@ -80,38 +80,37 @@ a {
   color: var(--gray1);
 }
 
-#noteDisplay {
+.noteDisplay {
   margin-bottom: 10px;
   position: relative;
 }
 
-#accidental {
+.accidental {
   position: absolute;
   top: 0;
   font-size: calc(6px + 8vmin);
 }
 
-#octave {
+.octave {
   font-size: calc(5px + 8vmin);
 }
 
-#frequencyDisplay {
+.frequencyDisplay {
   font-size: calc(12px + 6vmin);
   margin-top: 10px;
   color: var(--gray2);
 }
 
-#hz {
+.hz {
   font-size: 70%;
 }
-
-#fineTuner {
+.fineTuner {
   margin-top: calc(10px + 3vh);
   text-align: center;
   position: relative;
 }
 
-#fineTunePointer {
+.fineTunePointer {
   display: inline-block;
   position: relative;
   width: 2px;
@@ -121,7 +120,7 @@ a {
   transition: transform 0.3s;
 }
 
-#fineTuneMarks {
+.fineTuneMarks {
   position: absolute;
   top: 0;
   left: 50%;
@@ -143,7 +142,7 @@ a {
   height: 15px;
 }
 
-#settings {
+.settings{
   font-size: calc(10px + 0.7vw);
   position: fixed;
   display: inline-block;
@@ -164,7 +163,7 @@ a {
   height: min-content;
 }
 
-#openSettings {
+.openSettings {
   color: var(--gray3);
   cursor: pointer;
   width: 100%;
@@ -177,7 +176,7 @@ a {
   font-weight: bold;
 }
 
-#settingsList {
+.settingsList {
   list-style-type: none;
   padding: 0;
   white-space: nowrap;
@@ -187,7 +186,7 @@ a {
   flex-shrink: 1;
 }
 
-#settingsList li {
+.settingsList li {
   margin: 12px auto;
   padding-right: 110px;
   position: relative;
@@ -282,15 +281,15 @@ a {
   display: var(--more-settings-display);
 }
 
-#moreLess {
+.moreLess {
   position: relative;
 }
 
-#moreLess:before {
+.moreLess:before {
   content: "More";
 }
 
-#moreLess:after {
+.moreLess:after {
   content: "";
   position: absolute;
   top: 0.35em;
@@ -304,26 +303,26 @@ a {
   transition: transform 0.3s;
 }
 
-#moreSettings {
+.moreSettings {
   margin: 0;
   cursor: pointer;
 }
 
-#moreSettingsCheck:checked ~ #moreLess:after {
+.rotateChevron:checked ~ .moreLess:after {
   transform: rotate(-135deg);
 }
 
-#moreSettingsCheck:checked ~ #moreLess:before {
+.rotateChevron:checked ~ .moreLess:before {
   content: "Less";
 }
 
-#settingsList li:last-child {
+.settingsList li:last-child {
   margin-top: 8px;
   margin-bottom: 0;
   text-align: center;
 }
 
-#reloader {
+.reloader {
   position: relative;
   font-size: 80%;
   left: 55px;
@@ -333,23 +332,23 @@ a {
 }
 
 @media screen and (max-width: 900px) {
-  #noteDisplay {
+  .noteDisplay {
     margin-top: 30px;
   }
 
-  #frequencyDisplay {
+  .frequencyDisplay {
     font-size: calc(25px + 8vmin);
   }
 
-  #accidental {
+  .accidental {
     font-size: calc(19px + 8vmin);
   }
 
-  #octave {
+  .octave {
     font-size: calc(18px + 8vmin);
   }
 
-  #settings {
+  .settings{
     font-size: calc(12px + 1vw);
   }
 
@@ -359,7 +358,7 @@ a {
 }
 
 @media screen and (max-width: 320px) {
-  #settings {
+  .settings{
     max-width: 90vw;
   }
 
@@ -369,21 +368,21 @@ a {
     text-align: center;
   }
 
-  #settingsList li {
+  .settingsList li {
     margin-top: 18px;
     font-size: calc(12px + 0.5vw);
   }
 
-  #frequencyDisplay {
+  .frequencyDisplay {
     font-size: calc(12px + 6vmin);
     margin-top: 0;
   }
 
-  #noteDisplay {
+  .noteDisplay {
     margin-top: 15px;
   }
 
-  #reloader {
+  .reloader {
     font-size: 90%;
   }
 
@@ -398,11 +397,11 @@ a {
     margin-bottom: 0;
   }
 
-  #fineTuner {
+  .fineTuner {
     margin-top: calc(12px + 1vh);
   }
 
-  #frequencyDisplay {
+  .frequencyDisplay {
     margin-top: 0;
   }
 }
@@ -419,7 +418,7 @@ a {
     text-align: center;
   }
 
-  #settings {
+  .settings{
     margin-left: 0;
     transform: translate(var(--settingsX), var(--settingsY));
     top: 50%;
@@ -433,7 +432,7 @@ a {
     min-width: var(--hacky-hack-hack);
   }
 
-  #openSettings {
+  .openSettings {
     text-orientation: sideways;
     writing-mode: vertical-lr;
     left: 10px;
@@ -442,7 +441,7 @@ a {
     border-bottom-right-radius: 5px;
   }
 
-  #frequencyDisplay {
+  .frequencyDisplay {
     font-size: calc(12px + 6vmin);
   }
 

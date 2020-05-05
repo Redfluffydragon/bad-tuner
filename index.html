@@ -24,16 +24,16 @@
 		<link href="splashscreens/ipadpro2_splash.png" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
 	</head>
 	<body>
-		<div id="fineTuner">
-			<div id="fineTunePointer"></div>
-			<div id="fineTuneMarks"></div>
+		<div class="fineTuner">
+			<div id="fineTunePointer" class="fineTunePointer"></div>
+			<div id="fineTuneMarks" class="fineTuneMarks"></div>
 		</div>
-		<h1 id="noteDisplay" class="red"><span id="noteLetter">A</span><span id="accidental"></span><span id="octave">4</span></h1>
-		<h1 id="frequencyDisplay"><span id="justFrequency">440.0</span><span id="hz">Hz</span></h1>
-		<div id="settings">
-			<div id="openSettings">Settings</div>
+		<h1 id="noteDisplay" class="red noteDisplay"><span id="noteLetter">A</span><span id="accidental" class="accidental"></span><span id="octave" class="octave">4</span></h1>
+		<h1 class="frequencyDisplay"><span id="justFrequency">440.0</span><span class="hz">Hz</span></h1>
+		<div id="settings" class="settings">
+			<div id="openSettings" class="openSettings">Settings</div>
 			<hr>
-			<ul id="settingsList">
+			<ul id="settingsList" class="settingsList">
 				<li>
 					<label>
 						Dark mode:
@@ -43,13 +43,13 @@
 				</li>
 				<li title="Reversed minimum decibels">
 					Sensitivity:
-					<input id="showSensitivity" class="showInput" type="number" pattern="[0-9]*" min="40" max="100" value="60">
-					<input id="adjustSensitivity" class="slider" type="range" min="40" max="100" value="60">
+					<input id="showSensitivity" class="showInput" type="number" pattern="[0-9]*" min="40" max="100">
+					<input id="adjustSensitivity" class="slider" type="range" min="40" max="100">
 				</li>
 				<li title="About one degree each, only visual">
 					Tuning radius (deg):
-					<input  id="showTuning" class="showInput" type="number" pattern="[0-9]*" min="-1" max="10" value="2">
-					<input id="adjustTuning" class="slider" type="range" min="-1" max="10" value="2">
+					<input  id="showTuning" class="showInput" type="number" pattern="[0-9]*" min="-1" max="10">
+					<input id="adjustTuning" class="slider" type="range" min="-1" max="10">
 				</li>
 				<li title="To nearest tenth" class="optional">
 					<label>
@@ -60,22 +60,22 @@
 				</li>
 				<li title="May help with performance" class="optional">
 					Frequency precision:
-					<input id="showPrecision" class="showInput" value="32768" readonly>
-					<input id="adjustPrecision" class="slider" type="range" min="11" max="15" value="15">
+					<input id="showPrecision" class="showInput" readonly>
+					<input id="adjustPrecision" class="slider" type="range" min="11" max="15">
 				</li>
 				<li class="optional">
 					Number of ticks:
-					<input  id="showTicks" class="showInput"value="9" readonly>
-					<input id="adjustTicks" class="slider" type="range" min="7" max="15" value="9" step="2">
+					<input  id="showTicks" class="showInput" readonly>
+					<input id="adjustTicks" class="slider" type="range" min="7" max="15" step="2">
 				</li>
 				<li>
-					<label id="moreSettings">
-						<input id="moreSettingsCheck" class="checkbox" type="checkbox">
-						<span id="moreLess"></span>
+					<label class="moreSettings">
+						<input id="moreSettingsCheck" class="checkbox rotateChevron" type="checkbox">
+						<span class="moreLess"></span>
 					</label>
 				</li>
 				<li>
-					<a id="reloader" href="">Reload</a>
+					<a id="reloader" class="reloader" href="">Reload</a>
 				</li>
 			</ul>
 		</div>
