@@ -47,7 +47,7 @@ const startOptions = {
   darkMode: null,
   roundFreq: true,
   fftSize: 15,
-  minDecibels: -60,
+  minDecibels: -70,
   tuning: 2,
   tickNum: 9,
   moreSettings: false,
@@ -306,8 +306,9 @@ function showFrequency() {
   let lastHarmonic = Math.round(midBin/2); //the next lowest harmonic - wants to read high, so try to go down
   
   //check the volume difference vs an experimentally determined constant minus the midBin volume: if the volume diff is small enough, switch down an octave
-  //seems to work decently well, actually. Might have to add in aother factor that takes into account the frequency, as lower frequencies generate more and higher harmonics
-  if ((soundArray[midBin] - soundArray[lastHarmonic]) < Math.max(280 - soundArray[midBin], 60)) { //if the next lowest harmonic is close enough, switch to that
+  //300 - midBin seems to work pretty well to take into account the frequency
+  //seems to work decently well, actually. 
+  if ((soundArray[midBin] - soundArray[lastHarmonic]) < Math.max(280 + (300 - midBin) - soundArray[midBin], 60)) { //if the next lowest harmonic is close enough, switch to that
     finBin = interpolate(lastHarmonic);
   }
   else {
@@ -333,8 +334,7 @@ function showFrequency() {
 
     noteLetter.textContent = tempNote.charAt(0); //the first one is the letter
     accidental.textContent = tempNote.length > 1 ? tempNote.charAt(1) : ''; //then any accidentals
-    let tempOctave =  Math.max(Math.floor((roundSteps + 9)/notes.length) + 4, 0);
-    octave.textContent = tempOctave //have to add nine so it changes the octave on C instead of A, and limit it to zero 'cause negative octaves don't exist
+    octave.textContent = Math.max(Math.floor((roundSteps + 9)/notes.length) + 4, 0); //have to add nine so it changes the octave on C instead of A, and limit it to zero 'cause negative octaves don't exist
 
     // console.log((soundArray[midBin] - soundArray[lastHarmonic]), 280 - soundArray[midBin], midBin, tempNote+tempOctave); //for testing
     
