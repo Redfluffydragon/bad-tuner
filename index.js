@@ -35,7 +35,7 @@ const moreSettingsCheck = document.getElementById('moreSettingsCheck');
 
 const notes = ['A', 'B♭', 'B', 'C', 'C♯', 'D', 'E♭', 'E', 'F', 'F♯', 'G', 'A♭'];
 
-//for storing settings
+// for storing settings
 const startOptions = {
   darkMode: null,
   roundFreq: true,
@@ -47,79 +47,79 @@ const startOptions = {
 };
 let options = JSON.parse(localStorage.getItem('options')) || startOptions;
 
-//standalone window or not
+// standalone window or not
 let isInWebApp = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
 
-let settingsOpen = false; //settings open or not
+let settingsOpen = false; // settings open or not
 
-//for audio analyser
+// for audio analyser
 let audioCtxSampleRate;
 let analyser;
 let soundArray;
 
-//swipe the settings open and closed
-let initialPos = {}; //initial position of the touch
-let touchMoved = false; //if the touch moved or not
-let switchSettings = false; //if the settings should switch position or not
-let framePending = false; //if there's an animation frame pending (so another one isn't sent)
+// swipe the settings open and closed
+let initialPos = {}; // initial position of the touch
+let touchMoved = false; // if the touch moved or not
+let switchSettings = false; // if the settings should switch position or not
+let framePending = false; // if there's an animation frame pending (so another one isn't sent)
 
-//to move the settings div in either the x or y dimension depending on a css variable set using media queries (value passed in load and resize listeners)
+// to move the settings div in either the x or y dimension depending on a css variable set using media queries (value passed in load and resize listeners)
 const moveSettingsAxis = () => parseInt(getComputedStyle(document.documentElement).getPropertyValue('--settings-sideways'), 10) === 0 ? 'Y' : 'X';
 
-//system dark more detection
+// system dark more detection
 const darkMode = () => window.matchMedia('(prefers-color-scheme: dark)');
 
-//get pixel values for where the settings drawer should be when closed
+// get pixel values for where the settings drawer should be when closed
 const closedVals = {
   X: () => - settings.offsetWidth + openSettings.offsetWidth - 1, //+-1 is to get the divider line off screen on certain screen ratios
   Y: () => settings.offsetHeight - openSettings.offsetHeight + 1, 
 };
 
-//evaluates to an audio stream if successful
+// evaluates to an audio stream if successful
 const getAudio = async () => makeAnalyser(await navigator.mediaDevices.getUserMedia({ audio: true }));
 
-//set up audio analyser and show frequency data
+// set up audio analyser and show frequency data
 function makeAnalyser(stream) {
-  //get the audio context and create an analyser
+  // get the audio context and create an analyser
   const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   audioCtxSampleRate = audioCtx.sampleRate;
   
   analyser = audioCtx.createAnalyser();
 
-  //set fft size and minDecibels properties according to options
+  // set fft size and minDecibels properties according to options
   updateAnalyser();
 
-  //make an audio source and connect it to the analyser
+  // make an audio source and connect it to the analyser
   audioCtx.createMediaStreamSource(stream).connect(analyser);
 
-  soundArray = new Uint8Array(analyser.frequencyBinCount); //make a Uint8Array to store the audio data, same length as number of bins
+  soundArray = new Uint8Array(analyser.frequencyBinCount); // make a Uint8Array to store the audio data, same length as number of bins
 
   showFrequency();
 }
 
-//change analyser setting according to options
+// change analyser setting according to options
 function updateAnalyser() {
-  analyser.fftSize = Math.pow(2, options.fftSize); //adjust number of frequency bins (higher = more precision)
-  analyser.minDecibels = options.minDecibels; //adjust lower decibel cutoff (sensitivity, basically) more negative = more sensitive
+  analyser.fftSize = Math.pow(2, options.fftSize); // adjust number of frequency bins (higher = more precision)
+  analyser.minDecibels = options.minDecibels; // adjust lower decibel cutoff (sensitivity, basically) more negative = more sensitive
 }
 
-//barycentric interpolation seems to be a little more accurate than quadratic, and doesn't return nasty values
+// barycentric interpolation seems to be a little more accurate than quadratic, and doesn't return nasty values
 const interpolate = bin => bin + (soundArray[bin+1] - soundArray[bin-1]) / (soundArray[bin] + soundArray[bin-1] + soundArray[bin+1]);
 
-//recursive function to constantly get new audio data and display it
+// recursive function to constantly get new audio data and display it
 function showFrequency() {
-  requestAnimationFrame(showFrequency); //run again
+  requestAnimationFrame(showFrequency); // run again
 
-  analyser.getByteFrequencyData(soundArray); //get data into array
-  const midBin = soundArray.indexOf(Math.max(...soundArray)); //get index of loudest bin
+  analyser.getByteFrequencyData(soundArray); // get data into array
+  const midBin = soundArray.indexOf(Math.max(...soundArray)); // get index of loudest bin
   
-  let finBin; //for the final bin (after the logic)
-  const lastHarmonic = Math.round(midBin/2); //the next lowest harmonic - wants to read high, so try to go down
+  let finBin; // for the final bin (after the logic)
+  const lastHarmonic = Math.round(midBin/2); // the next lowest harmonic - wants to read high, so try to go down
   
-  //check the volume difference vs an experimentally determined constant minus the midBin volume: if the volume diff is small enough, switch down an octave
-  //300 - midBin seems to work pretty well to take into account the frequency
-  //seems to work decently well, actually. 
-  if ((soundArray[midBin] - soundArray[lastHarmonic]) < Math.max(280 + (300 - midBin) - soundArray[midBin], 60)) { //if the next lowest harmonic is close enough, switch to that
+  // check the volume difference vs an experimentally determined constant minus the midBin volume: if the volume diff is small enough, switch down an octave
+  // 300 - midBin seems to work pretty well to take into account the frequency
+  // seems to work decently well, actually. 
+  if ((soundArray[midBin] - soundArray[lastHarmonic]) < Math.max(280 + (300 - midBin) - soundArray[midBin], 60)) { // if the next lowest harmonic is close enough, switch to that
     finBin = interpolate(lastHarmonic);
   }
   else {
@@ -130,68 +130,68 @@ function showFrequency() {
     return;
   }
 
-  let frequency = finBin*audioCtxSampleRate/analyser.fftSize; //map the final bin to Hz
+  let frequency = finBin*audioCtxSampleRate/analyser.fftSize; // map the final bin to Hz
   
-  if (freqCheck.checked) { //if the round frequency checkbox is checked, round the frequency
+  if (freqCheck.checked) { // if the round frequency checkbox is checked, round the frequency
     frequency = frequency.toFixed(1);
   }
-  justFrequency.textContent = frequency; //show the frequency
+  justFrequency.textContent = frequency; // show the frequency
 
-  //take log base 2^(1/12) of the ratio between the current frequency and A4 to find the number of half-steps away from A4 - big decimal is approx. ln(2^(1/12))
+  // take log base 2^(1/12) of the ratio between the current frequency and A4 to find the number of half-steps away from A4 - big decimal is approx. ln(2^(1/12))
   const steps = Math.log(frequency/440)/0.05776226504666215;
   const roundSteps = Math.round(steps);
 
-  //get the letter note and octave and show them
-  let fixSteps = roundSteps < 0 ? notes.length + roundSteps%notes.length : roundSteps%notes.length; //if lower than A4, add notes.length to reverse the index (I think)
-  fixSteps = fixSteps === 12 ? 0 : fixSteps; //if it's an A it'll end up 12, which we need to be zero
-  const tempNote = notes[fixSteps]; //get the string from notes
+  // get the letter note and octave and show them
+  let fixSteps = roundSteps < 0 ? notes.length + roundSteps%notes.length : roundSteps%notes.length; // if lower than A4, add notes.length to reverse the index (I think)
+  fixSteps = fixSteps === 12 ? 0 : fixSteps; // if it's an A it'll end up 12, which we need to be zero
+  const tempNote = notes[fixSteps]; // get the string from notes
 
-  noteLetter.textContent = tempNote.charAt(0); //the first one is the letter
-  accidental.textContent = tempNote.length > 1 ? tempNote.charAt(1) : ''; //then any accidentals
-  octave.textContent = Math.max(Math.floor((roundSteps + 9)/notes.length) + 4, 0); //have to add nine so it changes the octave on C instead of A, and limit it to zero 'cause negative octaves don't exist
+  noteLetter.textContent = tempNote.charAt(0); // the first one is the letter
+  accidental.textContent = tempNote.length > 1 ? tempNote.charAt(1) : ''; // then any accidentals
+  octave.textContent = Math.max(Math.floor((roundSteps + 9)/notes.length) + 4, 0); // have to add nine so it changes the octave on C instead of A, and limit it to zero 'cause negative octaves don't exist
 
-  // console.log((soundArray[midBin] - soundArray[lastHarmonic]), 280 - soundArray[midBin], midBin, tempNote+tempOctave); //for testing
+  // console.log((soundArray[midBin] - soundArray[lastHarmonic]), 280 - soundArray[midBin], midBin, tempNote+tempOctave); // for testing
   
-  const showFineTune = (steps - roundSteps) * 90; //max is about +-0.5, so scale to 45 deg both ways
+  const showFineTune = (steps - roundSteps) * 90; // max is about +-0.5, so scale to 45 deg both ways
   
-  if (Math.abs(showFineTune) <= options.tuning) { //change to green if it's close enough
+  if (Math.abs(showFineTune) <= options.tuning) { // change to green if it's close enough
     noteDisplay.classList.replace('red', 'green');
   }
   else {
     noteDisplay.classList.replace('green', 'red');
   }
-  fineTunePointer.style.transform = `rotate(${showFineTune}deg)`; //rotate the pointer to the right angle
+  fineTunePointer.style.transform = `rotate(${showFineTune}deg)`; // rotate the pointer to the right angle
 }
 
-//for moving the settings in and out
+// for moving the settings in and out
 function moveSettings(resizing) {
   let tempSet;
-  if ((!settingsOpen && resizing) || (settingsOpen && !resizing)) { //if it's closed and just resizing, or if it's open and not resizing, set to closed posiiton
+  if ((!settingsOpen && resizing) || (settingsOpen && !resizing)) { // if it's closed and just resizing, or if it's open and not resizing, set to closed posiiton
     tempSet = closedVals[moveSettingsAxis()]();
   }
   else {
-    tempSet = 0; //0 is fully open
+    tempSet = 0; // 0 is fully open
   }
-  if (!resizing) { //toggle open and closed for js
+  if (!resizing) { // toggle open and closed for js
     settingsOpen = !settingsOpen;
   }
   document.documentElement.style.setProperty('--settings' + moveSettingsAxis(), tempSet + 'px');
 }
 
-//tell if two objects have the same keys
+// tell if two objects have the same keys
 function sameKeys(...objects) {
-  const getKeys = objects.reduce((keys, object) => keys.concat(Object.keys(object)), []); //get the keys of all objects and put in an array
-  const oneOfEach = new Set(getKeys); //put all the keys in a set
-  return objects.every(object => oneOfEach.size === Object.keys(object).length); //check if the set has the same length as the objects' keys
+  const getKeys = objects.reduce((keys, object) => keys.concat(Object.keys(object)), []); // get the keys of all objects and put in an array
+  const oneOfEach = new Set(getKeys); // put all the keys in a set
+  return objects.every(object => oneOfEach.size === Object.keys(object).length); // check if the set has the same length as the objects' keys
 }
 
-//change the number of tuning ticks there are
+// change the number of tuning ticks there are
 function changeTicks() {
-  fineTuneMarks.innerHTML = ''; //clear any previous ones
+  fineTuneMarks.innerHTML = ''; // clear any previous ones
   for (let i = 0; i < options.tickNum; i++) {
     const mark = document.createElement('DIV');
     mark.classList.add('tuningMark');
-    if (i % ((options.tickNum-1)/2) === 0) { //make the middle and end ones bigger
+    if (i % ((options.tickNum-1)/2) === 0) { // make the middle and end ones bigger
       mark.classList.add('bigTick');
     }
     mark.style.transform = `translateX(-50%) rotate(${90/(options.tickNum-1)*i-45}deg)`;
@@ -199,7 +199,7 @@ function changeTicks() {
   }
 }
 
-//if the tuning radius is negative one, it's off, so set it to say that (have to use placeholder 'cause it's a number input)
+// if the tuning radius is negative one, it's off, so set it to say that (have to use placeholder 'cause it's a number input)
 function tuningOnOff() {
   if (parseInt(adjustTuning.value, 10) === -1) {
     showTuning.value = '';
@@ -210,24 +210,24 @@ function tuningOnOff() {
   }
 }
 
-//for swiping the settings open and closed - called on touchmove
+// for swiping the settings open and closed - called on touchmove
 function swipeSettings(e) {
-  const currentPos = {X: e.targetTouches[0].clientX, Y: e.targetTouches[0].clientY}; //get the current position
-  if (Math.abs(currentPos[moveSettingsAxis()] - initialPos[moveSettingsAxis()]) > 1 && !framePending) { //if moved in the direction the settings would move more than 1px, and if there's no frame waiting
-    touchMoved = true; //to disable tapping on openSettings
-    framePending = true; //now there is one pending
+  const currentPos = {X: e.targetTouches[0].clientX, Y: e.targetTouches[0].clientY}; // get the current position
+  if (Math.abs(currentPos[moveSettingsAxis()] - initialPos[moveSettingsAxis()]) > 1 && !framePending) { // if moved in the direction the settings would move more than 1px, and if there's no frame waiting
+    touchMoved = true; // to disable tapping on openSettings
+    framePending = true; // now there is one pending
     requestAnimationFrame(() => {
-      framePending = false; //now there's not one pending
-      const closedOffset = closedVals[moveSettingsAxis()](); //the closed position for the current direction
-      const startOffset = settingsOpen ? 0 : closedOffset; //starting offset of the settings div when the touch starts (0 is fully open)
-      const touchOffset = initialPos[moveSettingsAxis()] - currentPos[moveSettingsAxis()]; //how far the touch event has moved
+      framePending = false; // now there's not one pending
+      const closedOffset = closedVals[moveSettingsAxis()](); // the closed position for the current direction
+      const startOffset = settingsOpen ? 0 : closedOffset; // starting offset of the settings div when the touch starts (0 is fully open)
+      const touchOffset = initialPos[moveSettingsAxis()] - currentPos[moveSettingsAxis()]; // how far the touch event has moved
       
-      const newPos = Math.round((startOffset - touchOffset) * 100) / 100; //calculated current position, keeping up with touch
+      const newPos = Math.round((startOffset - touchOffset) * 100) / 100; // calculated current position, keeping up with touch
 
-      //remove transition because it makes it really jittery on ios
+      // remove transition because it makes it really jittery on ios
       document.documentElement.style.setProperty('--settings-transition', 'unset');
 
-      //have to switch max and min because x goes negative and y goes positive
+      // have to switch max and min because x goes negative and y goes positive
       if (moveSettingsAxis() === 'Y') {
         document.documentElement.style.setProperty('--settingsY', Math.max(Math.min(newPos, closedOffset), 0) + 'px');
       }
@@ -235,9 +235,9 @@ function swipeSettings(e) {
         document.documentElement.style.setProperty('--settingsX', Math.min(Math.max(newPos, closedOffset), 0) + 'px');
       }
 
-      let settings90deg = moveSettingsAxis() === 'Y' ? settingsOpen : !settingsOpen; //reverse settingsOpen for swiping on the x axis, because it's opposite signs
+      let settings90deg = moveSettingsAxis() === 'Y' ? settingsOpen : !settingsOpen; // reverse settingsOpen for swiping on the x axis, because it's opposite signs
       
-      //if moved more than 50px in the right direction, go all the way that way. If not, snap back
+      // if moved more than 50px in the right direction, go all the way that way. If not, snap back
       if ((!settings90deg && touchOffset > 50) || (settings90deg && touchOffset < -50)) {
         switchSettings = true;
       }
@@ -248,28 +248,28 @@ function swipeSettings(e) {
   }
 }
 
-//change mode when the system mode preference changes (gets preference over manual toggle)
+// change mode when the system mode preference changes (gets preference over manual toggle)
 window.matchMedia('(prefers-color-scheme: dark)').addListener(() => {
   document.body.classList = '';
   darkModeCheck.checked = darkMode();
   options.darkMode = null;
 });
 
-//set up settings with correct values, generate tuning ticks, dark/light mode
+// set up settings with correct values, generate tuning ticks, dark/light mode
 window.addEventListener('load', () => {
-  if (isInWebApp && window.matchMedia('(orientation: landscape)')) { //gross hack to make sure it's the right width when reloaded in landscape
+  if (isInWebApp && window.matchMedia('(orientation: landscape)')) { // gross hack to make sure it's the right width when reloaded in landscape
     document.documentElement.style.setProperty('--hacky-hack-hack', settings.offsetWidth + 'px');
   }
 
-  //set the settings to actually the right position - tried with css, but couldn't get it exactly right for all screen sizes
+  // set the settings to actually the right position - tried with css, but couldn't get it exactly right for all screen sizes
   document.documentElement.style.setProperty('--settings' + moveSettingsAxis(), closedVals[moveSettingsAxis()]() + 'px');
 
-  //ask for microphone use
+  // ask for microphone use
   getAudio();
 
-  changeTicks(); //draw tuning ticks
+  changeTicks(); // draw tuning ticks
 
-  //for updating with new settings, since it won't get added in otherwise
+  // for updating with new settings, since it won't get added in otherwise
   if (!sameKeys(startOptions, options)) {
     options = startOptions;
   }
@@ -291,12 +291,12 @@ window.addEventListener('load', () => {
     showTuning.placeholder = 'OFF';
   }
 
-  if (options.darkMode !== null) { //if dark mode has been set manually, set everything according to that
+  if (options.darkMode !== null) { // if dark mode has been set manually, set everything according to that
     document.body.classList.add(options.darkMode ? 'dark' : 'light');
     darkModeCheck.checked = options.darkMode;
   }
   else {
-    darkModeCheck.checked = darkMode(); //else, make sure the checkbox reflects the auto value
+    darkModeCheck.checked = darkMode(); // else, make sure the checkbox reflects the auto value
   }
 
   if (options.moreSettings) {
@@ -307,14 +307,14 @@ window.addEventListener('load', () => {
   }
 }, false);
 
-//save the options object in localstorage - ios doesn't support beforeunload
+// save the options object in localstorage - ios doesn't support beforeunload
 const whichUnload = (navigator.userAgent.match(/iPad/i) || navigator.userAgent.match(/iPhone/i)) ? 'pagehide' : 'beforeunload';
 window.addEventListener(whichUnload, () => {
   options.roundFreq = freqCheck.checked;
   localStorage.setItem('options', JSON.stringify(options));
 }, false);
 
-//make sure the settings are still in the right place
+// make sure the settings are still in the right place
 window.addEventListener('resize', () => {
   const resetAxis = moveSettingsAxis() === 'X' ? 'Y' : 'X';
   document.documentElement.style.setProperty('--settings' + resetAxis, '-50%');
@@ -323,13 +323,13 @@ window.addEventListener('resize', () => {
     document.documentElement.style.setProperty('--hacky-hack-hack', '0');
     window.setTimeout(() => {
       moveSettings(true);
-    }, 50); //disgusting hack to get rid of like 2 pixels when going from portrait to landscape in standalone mode
+    }, 50); // disgusting hack to get rid of like 2 pixels when going from portrait to landscape in standalone mode
   }
 }, false);
 
-//click events: open/close settings and reload the page
+// click events: open/close settings and reload the page
 document.addEventListener('click', e => {
-  if (!e.target.closest('#settings')) { //if not on settings, close settings
+  if (!e.target.closest('#settings')) { // if not on settings, close settings
     document.documentElement.style.setProperty('--settings' + moveSettingsAxis(), closedVals[moveSettingsAxis()]() + 'px');
     settingsOpen = false;
   }
@@ -343,23 +343,23 @@ document.addEventListener('click', e => {
 }, false);
 
 settings.addEventListener('touchstart', e => {
-  if (e.target.tagName !== 'INPUT' && !e.target.classList.contains('checkmark') && e.targetTouches[0].clientY < window.innerHeight) { //don't swipe in and out on the inputs or when the touch is coming from the bottom of the screen
+  if (e.target.tagName !== 'INPUT' && !e.target.classList.contains('checkmark') && e.targetTouches[0].clientY < window.innerHeight) { // don't swipe in and out on the inputs or when the touch is coming from the bottom of the screen
     touchMoved = false;
     switchSettings = false;
     initialPos = {X: e.targetTouches[0].clientX, Y: e.targetTouches[0].clientY};
     document.addEventListener('touchmove', swipeSettings, {passive: true, useCapture: true});
 
-    settings.addEventListener('touchend', () => { //add self-removing touchend listener
-      document.documentElement.style.setProperty('--settings-transition', 'transform .4s'); //add transition back so it's smooth the rest of the way
+    settings.addEventListener('touchend', () => { // add self-removing touchend listener
+      document.documentElement.style.setProperty('--settings-transition', 'transform .4s'); // add transition back so it's smooth the rest of the way
       if (touchMoved) {
         moveSettings(!switchSettings);
       }
-      document.removeEventListener('touchmove', swipeSettings, {passive: true, useCapture: true}); //remove the touchmove listener for performance
+      document.removeEventListener('touchmove', swipeSettings, {passive: true, useCapture: true}); // remove the touchmove listener for performance
     }, {useCapture: true, once: true});
   }
 }, true);
 
-//to reset the settings position if the control center gets opened or something (only sort of works)
+// to reset the settings position if the control center gets opened or something (only sort of works)
 settings.addEventListener('touchcancel', () => { 
   moveSettings(true); 
   window.setTimeout(() => {
@@ -367,7 +367,7 @@ settings.addEventListener('touchcancel', () => {
   }, 100);
 }, false);
 
-//event listeners  for settings inputs
+// event listeners  for settings inputs
 darkModeCheck.addEventListener('input', () => {
   options.darkMode = darkModeCheck.checked;
   if (options.darkMode) {
