@@ -349,7 +349,7 @@ a {
     font-size: calc(18px + 8vmin);
   }
 
-  .settings{
+  .settings {
     font-size: calc(12px + 1vw);
   }
 
@@ -359,7 +359,7 @@ a {
 }
 
 @media screen and (max-width: 320px) {
-  .settings{
+  .settings {
     max-width: 90vw;
   }
 
@@ -419,7 +419,7 @@ a {
     text-align: center;
   }
 
-  .settings{
+  .settings {
     margin-left: 0;
     transform: translate(var(--settingsX), var(--settingsY));
     top: 50%;
