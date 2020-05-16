@@ -1,8 +1,6 @@
 'use strict';
 
-/* if (navigator.serviceWorker) {
-  navigator.serviceWorker.register('/tuner/sw.js', {scope: '/tuner/'});
-} */
+// navigator.serviceWorker && navigator.serviceWorker.register('/tuner/sw.js', {scope: '/tuner/'});
 
 const fineTunePointer = document.getElementById('fineTunePointer');
 const fineTuneMarks = document.getElementById('fineTuneMarks');
@@ -217,42 +215,43 @@ function tuningOnOff() {
 
 // for swiping the settings open and closed - called on touchmove
 function swipeSettings(e) {
-  const currentPos = {X: e.targetTouches[0].clientX, Y: e.targetTouches[0].clientY}; // get the current position
-  if (Math.abs(currentPos[moveSettingsAxis()] - initialPos[moveSettingsAxis()]) > 1 && !framePending) { // if moved in the direction the settings would move more than 1px, and if there's no frame waiting
-    touchMoved = true; // to disable tapping on openSettings
-    framePending = true; // now there is one pending
-    requestAnimationFrame(() => {
-      framePending = false; // now there's not one pending
-      const closedOffset = closedVals[moveSettingsAxis()](); // the closed position for the current direction
-      const startOffset = settingsOpen ? 0 : closedOffset; // starting offset of the settings div when the touch starts (0 is fully open)
-      const touchOffset = initialPos[moveSettingsAxis()] - currentPos[moveSettingsAxis()]; // how far the touch event has moved
-
-      const newPos = Math.round((startOffset - touchOffset) * 100) / 100; // calculated current position, keeping up with touch
-
-      // remove transition because it makes it really jittery on ios
-      settings.style.transition = 'unset';
-
-      // have to switch max and min because x goes negative and y goes positive
-      if (moveSettingsAxis() === 'Y') {
-        document.documentElement.style.setProperty('--settingsY', Math.max(Math.min(newPos, closedOffset), 0) + 'px');
-      }
-      else {
-        document.documentElement.style.setProperty('--settingsX', Math.min(Math.max(newPos, closedOffset), 0) + 'px');
-      }
-
-      // reverse settingsOpen for swiping on the x axis, because it's opposite signs
-      const settings90deg = moveSettingsAxis() === 'Y' ? settingsOpen : !settingsOpen;
-
-      // if moved more than 50px in the right direction, go all the way that way. If not, snap back
-      switchSettings = ((!settings90deg && touchOffset > 50) || (settings90deg && touchOffset < -50));
-    });
+  if (framePending) { // if there's a frame waiting, don't do anything
+    return;
   }
+  const currentPos = {X: e.targetTouches[0].clientX, Y: e.targetTouches[0].clientY}; // get the current position
+  touchMoved = true; // to disable tapping on openSettings
+  framePending = true; // now there is one pending
+  requestAnimationFrame(() => {
+    framePending = false; // now there's not one pending
+    const closedOffset = closedVals[moveSettingsAxis()](); // the closed position for the current direction
+    const startOffset = settingsOpen ? 0 : closedOffset; // starting offset of the settings div when the touch starts (0 is fully open)
+    const touchOffset = initialPos[moveSettingsAxis()] - currentPos[moveSettingsAxis()]; // how far the touch event has moved
+
+    const newPos = Math.round((startOffset - touchOffset) * 100) / 100; // calculated current position, keeping up with touch
+
+    // remove transition because it makes it really jittery on ios
+    settings.style.transition = 'unset';
+
+    // have to switch max and min because x goes negative and y goes positive
+    if (moveSettingsAxis() === 'Y') {
+      document.documentElement.style.setProperty('--settingsY', Math.max(Math.min(newPos, closedOffset), 0) + 'px');
+    }
+    else {
+      document.documentElement.style.setProperty('--settingsX', Math.min(Math.max(newPos, closedOffset), 0) + 'px');
+    }
+
+    // reverse settingsOpen for swiping on the x axis, because it's opposite signs
+    const settings90deg = moveSettingsAxis() === 'Y' ? settingsOpen : !settingsOpen;
+
+    // if moved more than 50px in the right direction, go all the way that way. If not, snap back
+    switchSettings = ((!settings90deg && touchOffset > 50) || (settings90deg && touchOffset < -50));
+  });
 }
 
 // change mode when the system mode preference changes (gets preference over manual toggle)
 window.matchMedia('(prefers-color-scheme: dark)').addListener(() => {
-  document.body.classList = '';
-  darkModeCheck.checked = darkMode();
+  document.body.className = ''; //clear classes
+  darkModeCheck.checked = !darkModeCheck.checked;
   options.darkMode = null;
 });
 
@@ -300,7 +299,7 @@ window.addEventListener('load', () => {
 
   if (options.moreSettings) {
     document.documentElement.style.setProperty('--more-settings-display', 'list-item');
-    document.documentElement.style.setProperty('--make-line-up', 'right');
+    showTuning.classList.remove('widestOption');
 
     moreSettingsCheck.checked = options.moreSettings;
   }
@@ -342,7 +341,8 @@ document.addEventListener('click', e => {
 }, false);
 
 settings.addEventListener('touchstart', e => {
-  if (e.target.tagName !== 'INPUT' && !e.target.classList.contains('checkmark') && e.targetTouches[0].clientY < window.innerHeight) { // don't swipe in and out on the inputs or when the touch is coming from the bottom of the screen
+  // don't swipe in and out on the inputs or when the touch is coming from the bottom of the screen
+  if (!e.target.matches('input') && !e.target.matches('.checkmark') && e.targetTouches[0].clientY < window.innerHeight) {
     touchMoved = false;
     switchSettings = false;
     initialPos = {X: e.targetTouches[0].clientX, Y: e.targetTouches[0].clientY};
@@ -368,14 +368,7 @@ settings.addEventListener('touchcancel', () => {
 // event listeners  for settings inputs
 darkModeCheck.addEventListener('input', () => {
   options.darkMode = darkModeCheck.checked;
-  if (options.darkMode) {
-    document.body.classList.add('dark');
-    document.body.classList.remove('light');
-  }
-  else {
-    document.body.classList.add('light');
-    document.body.classList.remove('dark');
-  }
+  document.body.className = options.darkMode ? 'dark' : 'light';
 }, false);
 
 adjustPrecision.addEventListener('input', () => {
@@ -418,9 +411,7 @@ showTuning.addEventListener('input', () => {
   options.tuning = parseInt(adjustTuning.value, 10);
 
   showTuning.placeholder = parseInt(showTuning.value, 10) === -1 ? 'OFF' : '';
-  if (parseInt(showTuning.value, 10) === -1) {
-    showTuning.value = '';
-  }
+  parseInt(showTuning.value, 10) === -1 && (showTuning.value = '');
 }, false);
 
 showTuning.addEventListener('focusout', tuningOnOff, false);
@@ -433,6 +424,6 @@ adjustTicks.addEventListener('input', () => {
 
 moreSettingsCheck.addEventListener('input', () => {
   document.documentElement.style.setProperty('--more-settings-display', moreSettingsCheck.checked ? 'list-item' : 'none');
-  document.documentElement.style.setProperty('--make-line-up', moreSettingsCheck.checked ? 'right' : 'unset');
+  moreSettingsCheck.checked ? showTuning.classList.remove('widestOption') : showTuning.classList.add('widestOption');
   options.moreSettings = moreSettingsCheck.checked;
 }, false);
