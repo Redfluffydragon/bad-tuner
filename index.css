@@ -1,70 +1,65 @@
 :root {
   color-scheme: light dark;
-  --background: white;
-  --settings-background: white;
+  --bg: white;
+  --settings-bg: white;
   --red: #aa0101;
   --green: #085c08;
   --gray1: rgb(66, 66, 66);
   --gray2: rgb(66, 66, 66);
   --gray3: #303030;
   --shadow: rgba(0, 0, 0, 0.1);
-  --img-invert: 20%;
 
   --settingsY: 75%;
   --settingsX: -50%;
   --settings-sideways: 0;
   --hacky-hack-hack: 0;
   --more-settings-display: none;
-  --make-line-up: unset;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: rgb(29, 29, 29);
-    --settings-background: rgb(12, 12, 12);
+    --bg: rgb(29, 29, 29);
+    --settings-bg: rgb(12, 12, 12);
     --red: #9c0202;
     --green: #085c08;
     --gray1: rgb(97, 97, 97);
     --gray2: rgb(102, 102, 102);
     --gray3: #8f8f8f;
-    --shadow: rgba(0, 0, 0, 0);
-    --img-invert: 35%;
+    --shadow: rgba(92, 92, 92, 0.041);
   }
 }
 
 .light {
-  --background: white;
-  --settings-background: white;
+  --bg: white;
+  --settings-bg: white;
   --red: #aa0101;
   --green: #085c08;
   --gray1: rgb(66, 66, 66);
   --gray2: rgb(66, 66, 66);
   --gray3: #303030;
   --shadow: rgba(0, 0, 0, 0.1);
-  --img-invert: 20%;
 }
 
 .dark {
-  --background: rgb(29, 29, 29);
-  --settings-background: rgb(12, 12, 12);
+  --bg: rgb(29, 29, 29);
+  --settings-bg: rgb(12, 12, 12);
   --red: #9c0202;
   --green: #085c08;
   --gray1: rgb(97, 97, 97);
   --gray2: rgb(102, 102, 102);
   --gray3: #8f8f8f;
-  --shadow: rgba(0, 0, 0, 0);
-  --img-invert: 35%;
+  --shadow: rgba(92, 92, 92, 0.041);
 }
 
 body {
   width: 100%;
+  height: 100%;
   margin: 0;
   padding: 0;
   text-align: center;
   font-family: sans-serif;
   font-size: calc(12px + 8vmin);
-  height: 100%;
-  background: var(--background);
+  background: var(--bg);
   position: fixed;
 }
 
@@ -73,10 +68,6 @@ hr {
   border: 1px solid var(--gray2);
   margin: 0;
   background: var(--gray2);
-}
-
-a {
-  color: var(--gray1);
 }
 
 .noteDisplay {
@@ -145,18 +136,16 @@ a {
 .settings {
   font-size: calc(10px + 0.7vw);
   position: fixed;
-  display: inline-block;
   display: flex;
   flex-direction: column;
   margin-left: 50%;
   bottom: 0;
   transform: translate(var(--settingsX), var(--settingsY));
-  background: var(--settings-background);
+  background: var(--settings-bg);
   box-shadow: 10px -10px 20px var(--shadow), -10px -10px 20px var(--shadow);
   border-top-right-radius: 5px;
   border-top-left-radius: 5px;
-  padding: 10px;
-  padding-top: 0;
+  padding: 0 10px 10px 10px;
   transition: transform 0.4s;
   text-align: left;
   color: var(--gray1);
@@ -180,10 +169,8 @@ a {
   list-style-type: none;
   padding: 0;
   white-space: nowrap;
-  margin-top: 5px;
+  margin: 5px auto 0;
   position: relative;
-  margin-bottom: 0;
-  flex-shrink: 1;
 }
 
 .settingsList li {
@@ -212,7 +199,7 @@ a {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: var(--settings-background);
+  background: var(--settings-bg);
   transition: transform 0.3s;
 }
 
@@ -269,12 +256,8 @@ a {
   font-size: calc(12px + 0.4vw);
 }
 
-#showPrecision {
+.widestOption {
   float: unset;
-}
-
-#showTuning {
-  float: var(--make-line-up);
 }
 
 .optional {
@@ -329,6 +312,7 @@ a {
   display: inline-block;
   top: -7px;
   padding: 7px;
+  color: var(--gray1);
 }
 
 @media screen and (max-width: 900px) {
@@ -393,8 +377,7 @@ a {
 
 @media screen and (max-height: 400px) {
   .noteDisplay {
-    margin-top: 0.5vh;
-    margin-bottom: 0;
+    margin: 0.5vh auto 0;
   }
 
   .fineTuner {
@@ -423,10 +406,10 @@ a {
     transform: translate(var(--settingsX), var(--settingsY));
     top: 50%;
     flex-direction: row-reverse;
+    width: min-content;
     height: min-content;
     border-top-left-radius: 0;
     border-bottom-right-radius: 5px;
-    width: min-content;
     padding-bottom: 0;
     box-shadow: 10px -10px 20px var(--shadow), 10px 10px 20px var(--shadow);
     min-width: var(--hacky-hack-hack);
