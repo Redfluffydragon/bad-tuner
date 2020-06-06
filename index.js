@@ -1,6 +1,6 @@
 'use strict';
 
-// navigator.serviceWorker && navigator.serviceWorker.register('/tuner/sw.js', {scope: '/tuner/'});
+navigator.serviceWorker && navigator.serviceWorker.register('/tuner/sw.js', {scope: '/tuner/'});
 
 const fineTunePointer = document.getElementById('fineTunePointer');
 const fineTuneMarks = document.getElementById('fineTuneMarks');
@@ -61,14 +61,14 @@ let touchMoved = false; // if the touch moved or not
 let switchSettings = false; // if the settings should switch position or not
 let framePending = false; // if there's an animation frame pending (so another one isn't sent)
 
-// to move the settings div in either the x or y dimension depending on a css variable set using media queries
+/**Move the settings div in either the x or y dimension depending on a CSS variable set using media queries*/
 const moveSettingsAxis = () =>
   parseInt(getComputedStyle(document.documentElement).getPropertyValue('--settings-sideways'), 10) === 0 ? 'Y' : 'X';
 
-// system dark more detection
+/**Get dark mode from CSS media query*/
 const darkMode = () => window.matchMedia('(prefers-color-scheme: dark)');
 
-// get pixel values for where the settings drawer should be when closed
+/**Get pixel values for where the settings drawer should be when closed*/
 const closedVals = {
   X: () => - settings.offsetWidth + openSettings.offsetWidth - 1, //+-1 is to get the divider line off screen on certain screen ratios
   Y: () => settings.offsetHeight - openSettings.offsetHeight + 1,
@@ -77,7 +77,10 @@ const closedVals = {
 // evaluates to an audio stream if successful
 const getAudio = async () => makeAnalyser(await navigator.mediaDevices.getUserMedia({ audio: true }));
 
-// set up audio analyser and show frequency data
+/**
+ * Set up audio analyser and show frequency data
+ * @param {Object} stream 
+ */
 function makeAnalyser(stream) {
   // get the audio context and create an analyser
   const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -96,16 +99,22 @@ function makeAnalyser(stream) {
   showFrequency();
 }
 
-// change analyser settings according to options
+/**Change analyser settings according to options*/
 function updateAnalyser() {
   analyser.fftSize = Math.pow(2, options.fftSize); // adjust number of frequency bins (higher = more precision)
   analyser.minDecibels = options.minDecibels; // adjust lower decibel cutoff (sensitivity, basically) more negative = more sensitive
 }
 
-// barycentric interpolation seems to be a little more accurate than quadratic, and doesn't return a variety of nasty values
+/**
+ * Barycentric interpolation
+ * @param {Number} bin 
+ */
 const interpolate = bin =>
   bin + (soundArray[bin+1] - soundArray[bin-1]) / (soundArray[bin] + soundArray[bin-1] + soundArray[bin+1]);
 
+/**
+ * @param {Number} bin 
+ */
 // filter out harmonics (needs some tweaking) - returns NaN when silent
 function filterHarmonics(bin) {
   // check the volume difference vs an experimentally determined constant minus the bin volume: if the volume diff is small enough, switch down an octave
@@ -121,7 +130,7 @@ function filterHarmonics(bin) {
   }
 }
 
-// recursive animationsFrame function to constantly get new audio data and display it
+/**Recursive requestAnimationFrame function to constantly get new audio data and display it*/
 function showFrequency() {
   requestAnimationFrame(showFrequency); // run again
 
@@ -167,7 +176,10 @@ function showFrequency() {
   fineTunePointer.style.transform = `rotate(${showFineTune}deg)`; // rotate the pointer to the right angle
 }
 
-// for moving the settings in and out
+/**
+ * Move settings in or out
+ * @param {boolean} resizing
+ */
 function moveSettings(resizing) {
   let newSettingsPos;
   if ((!settingsOpen && resizing) || (settingsOpen && !resizing)) { // if it's closed and just resizing, or if it's open and not resizing, set to closed posiiton
@@ -181,14 +193,17 @@ function moveSettings(resizing) {
   document.documentElement.style.setProperty('--settings' + moveSettingsAxis(), newSettingsPos + 'px');
 }
 
-// tell if two objects have the same keys
+/**
+ * Check if two objects have the same keys
+ * @param  {...Object} objects 
+ */
 function sameKeys(...objects) {
   const getKeys = objects.reduce((keys, object) => keys.concat(Object.keys(object)), []); // get the keys of all objects and put in an array
   const oneOfEach = new Set(getKeys); // put all the keys in a set
   return objects.every(object => oneOfEach.size === Object.keys(object).length); // check if the set has the same length as the objects' keys
 }
 
-// change the number of tuning ticks there are
+/**Change the number of tuning ticks*/
 function changeTicks() {
   fineTuneMarks.innerHTML = ''; // clear any previous ones
   for (let i = options.tickNum; i--;) {
@@ -213,7 +228,10 @@ function tuningOnOff() {
   }
 }
 
-// for swiping the settings open and closed - called on touchmove
+/**
+ * Move settings with swipes and decide which position to snap to
+ * @param {HTMLElement} e 
+ */
 function swipeSettings(e) {
   if (framePending) { // if there's a frame waiting, don't do anything
     return;
@@ -264,7 +282,7 @@ window.addEventListener('load', () => {
   // set the settings to actually the right position - tried with css, but couldn't get it exactly right for all screen sizes
   window.setTimeout(() => { // dammit this was working before and I don't know why it needs setTimeout now
     document.documentElement.style.setProperty('--settings' + moveSettingsAxis(), closedVals[moveSettingsAxis()]() + 'px');
-  }, 0);
+  }, 10);
 
   // ask for microphone use
   getAudio();
