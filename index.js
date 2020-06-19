@@ -13,6 +13,7 @@ const octave = document.getElementById('octave');
 const settings = document.getElementById('settings');
 const openSettings = document.getElementById('openSettings');
 
+const settingsForm = document.getElementById('settingsForm');
 const darkModeCheck = document.getElementById('darkModeCheck');
 
 const freqCheck = document.getElementById('freqCheck');
@@ -384,64 +385,59 @@ settings.addEventListener('touchcancel', () => {
 }, false);
 
 // event listeners  for settings inputs
-darkModeCheck.addEventListener('input', () => {
-  options.darkMode = darkModeCheck.checked;
-  document.body.className = options.darkMode ? 'dark' : 'light';
-}, false);
-
-adjustPrecision.addEventListener('input', () => {
-  showPrecision.value = Math.pow(2, adjustPrecision.value);
-  options.fftSize = parseInt(adjustPrecision.value, 10);
-  updateAnalyser();
-}, false);
-
-adjustSensitivity.addEventListener('input', () => {
-  showSensitivity.value = adjustSensitivity.value;
-  options.minDecibels = adjustSensitivity.value*-1;
-  updateAnalyser();
-}, false);
-
-showSensitivity.addEventListener('input', () => {
-  if (showSensitivity.value.length === 2) {
-    showSensitivity.value = Math.max(parseInt(showSensitivity.value, 10), 40);
+settingsForm.addEventListener('input', e => {
+  if (e.target.matches('#darkModeCheck')) {
+    options.darkMode = darkModeCheck.checked;
+    document.body.className = options.darkMode ? 'dark' : 'light';
   }
-  else if (showSensitivity.value.length > 2) {
-    showSensitivity.value = Math.min(parseInt(showSensitivity.value, 10), 100);
+  else if (e.target.matches('#adjustPrecision')) {
+    showPrecision.value = Math.pow(2, adjustPrecision.value);
+    options.fftSize = parseInt(adjustPrecision.value, 10);
+    updateAnalyser();
   }
-  adjustSensitivity.value = showSensitivity.value;
-  options.minDecibels = parseInt(adjustSensitivity.value, 10)*-1;
-  updateAnalyser();
+  else if (e.target.matches('#adjustSensitivity')) {
+    showSensitivity.value = adjustSensitivity.value;
+    options.minDecibels = adjustSensitivity.value*-1;
+    updateAnalyser();
+  }
+  else if (e.target.matches('#showSensitivity')) {
+    if (showSensitivity.value.length === 2) {
+      showSensitivity.value = Math.max(parseInt(showSensitivity.value, 10), 40);
+    }
+    else if (showSensitivity.value.length > 2) {
+      showSensitivity.value = Math.min(parseInt(showSensitivity.value, 10), 100);
+    }
+    adjustSensitivity.value = showSensitivity.value;
+    options.minDecibels = parseInt(adjustSensitivity.value, 10)*-1;
+    updateAnalyser();
+  }
+  else if (e.target.matches('#adjustTuning')) {
+    tuningOnOff();
+    options.tuning = parseInt(adjustTuning.value, 10);
+  }
+  else if (e.target.matches('#showTuning')) {
+    showTuning.value = Math.max(Math.min(parseInt(showTuning.value, 10), 10), -1);
+
+    adjustTuning.value = showTuning.value;
+    options.tuning = parseInt(adjustTuning.value, 10);
+
+    showTuning.placeholder = parseInt(showTuning.value, 10) === -1 ? 'OFF' : '';
+    parseInt(showTuning.value, 10) === -1 && (showTuning.value = '');
+  }
+  else if (e.target.matches('#adjustTicks')) {
+    showTicks.value = adjustTicks.value;
+    options.tickNum = parseInt(adjustTicks.value, 10);
+    changeTicks();
+  }
+  else if (e.target.matches('#moreSettingsCheck')) {
+    document.documentElement.style.setProperty('--more-settings-display', moreSettingsCheck.checked ? 'list-item' : 'none');
+    moreSettingsCheck.checked ? showTuning.classList.remove('widestOption') : showTuning.classList.add('widestOption');
+    options.moreSettings = moreSettingsCheck.checked;
+  }
 }, false);
 
 showSensitivity.addEventListener('focusout', () => {
   showSensitivity.value = adjustSensitivity.value;
 }, false);
 
-adjustTuning.addEventListener('input', () => {
-  tuningOnOff();
-  options.tuning = parseInt(adjustTuning.value, 10);
-}, false);
-
-showTuning.addEventListener('input', () => {
-  showTuning.value = Math.max(Math.min(parseInt(showTuning.value, 10), 10), -1);
-
-  adjustTuning.value = showTuning.value;
-  options.tuning = parseInt(adjustTuning.value, 10);
-
-  showTuning.placeholder = parseInt(showTuning.value, 10) === -1 ? 'OFF' : '';
-  parseInt(showTuning.value, 10) === -1 && (showTuning.value = '');
-}, false);
-
 showTuning.addEventListener('focusout', tuningOnOff, false);
-
-adjustTicks.addEventListener('input', () => {
-  showTicks.value = adjustTicks.value;
-  options.tickNum = parseInt(adjustTicks.value, 10);
-  changeTicks();
-}, false);
-
-moreSettingsCheck.addEventListener('input', () => {
-  document.documentElement.style.setProperty('--more-settings-display', moreSettingsCheck.checked ? 'list-item' : 'none');
-  moreSettingsCheck.checked ? showTuning.classList.remove('widestOption') : showTuning.classList.add('widestOption');
-  options.moreSettings = moreSettingsCheck.checked;
-}, false);

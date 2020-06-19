@@ -33,51 +33,53 @@
 		<div id="settings" class="settings">
 			<div id="openSettings" class="openSettings">Settings</div>
 			<hr>
-			<ul id="settingsList" class="settingsList">
-				<li>
-					<label>
-						Dark mode:
-						<input id="darkModeCheck" class="checkbox" type="checkbox">
-						<span class="checkmark"></span>
-					</label>
-				</li>
-				<li title="Reversed minimum decibels">
-					Sensitivity:
-					<input id="showSensitivity" class="showInput" type="number" pattern="[0-9]*" min="40" max="100">
-					<input id="adjustSensitivity" class="slider" type="range" min="40" max="100">
-				</li>
-				<li title="About one degree each, only visual">
-					Tuning radius (deg):
-					<input  id="showTuning" class="showInput widestOption" type="number" pattern="[0-9]*" min="-1" max="10">
-					<input id="adjustTuning" class="slider" type="range" min="-1" max="10">
-				</li>
-				<li title="To nearest tenth" class="optional">
-					<label>
-						Round frequency:
-						<input id="freqCheck" class="checkbox" type="checkbox" checked>
-						<span class="checkmark"></span>
-					</label>
-				</li>
-				<li title="May help with performance" class="optional">
-					Frequency precision:
-					<input id="showPrecision" class="showInput widestOption" readonly>
-					<input id="adjustPrecision" class="slider" type="range" min="11" max="15">
-				</li>
-				<li class="optional">
-					Number of ticks:
-					<input  id="showTicks" class="showInput" readonly>
-					<input id="adjustTicks" class="slider" type="range" min="7" max="15" step="2">
-				</li>
-				<li>
-					<label class="moreSettings">
-						<input id="moreSettingsCheck" class="checkbox rotateChevron" type="checkbox">
-						<span class="moreLess"></span>
-					</label>
-				</li>
-				<li>
-					<a id="reloader" class="reloader" href="">Reload</a>
-				</li>
-			</ul>
+			<form id="settingsForm">
+				<ul id="settingsList" class="settingsList">
+					<li>
+						<label>
+							Dark mode:
+							<input id="darkModeCheck" class="checkbox" type="checkbox">
+							<span class="checkmark"></span>
+						</label>
+					</li>
+					<li title="Reversed minimum decibels">
+						Sensitivity:
+						<input id="showSensitivity" class="showInput" type="number" pattern="[0-9]*" min="40" max="100">
+						<input id="adjustSensitivity" class="slider" type="range" min="40" max="100">
+					</li>
+					<li title="About one degree each, only visual">
+						Tuning radius (deg):
+						<input  id="showTuning" class="showInput widestOption" type="number" pattern="[0-9]*" min="-1" max="10">
+						<input id="adjustTuning" class="slider" type="range" min="-1" max="10">
+					</li>
+					<li title="To nearest tenth" class="optional">
+						<label>
+							Round frequency:
+							<input id="freqCheck" class="checkbox" type="checkbox" checked>
+							<span class="checkmark"></span>
+						</label>
+					</li>
+					<li title="May help with performance" class="optional">
+						Frequency precision:
+						<input id="showPrecision" class="showInput widestOption" readonly>
+						<input id="adjustPrecision" class="slider" type="range" min="11" max="15">
+					</li>
+					<li class="optional">
+						Number of ticks:
+						<input  id="showTicks" class="showInput" readonly>
+						<input id="adjustTicks" class="slider" type="range" min="7" max="15" step="2">
+					</li>
+					<li>
+						<label class="moreSettings">
+							<input id="moreSettingsCheck" class="checkbox rotateChevron" type="checkbox">
+							<span class="moreLess"></span>
+						</label>
+					</li>
+					<li>
+						<a id="reloader" class="reloader" href="">Reload</a>
+					</li>
+				</ul>
+			</form>
 		</div>
 	</body>
 </html>
