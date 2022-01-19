@@ -133,8 +133,6 @@ function filterHarmonics(bin) {
 
 /**Recursive requestAnimationFrame function to constantly get new audio data and display it*/
 function showFrequency() {
-  requestAnimationFrame(showFrequency); // run again
-
   analyser.getByteFrequencyData(soundArray); // get data into array
 
   // get loudest bin and filter out harmonics to get (hopefully) the real bin
@@ -144,7 +142,7 @@ function showFrequency() {
     return;
   }
 
-  let frequency = findBin*audioCtxSampleRate/analyser.fftSize; // map the final bin to Hz
+  let frequency = findBin * audioCtxSampleRate / analyser.fftSize; // map the final bin to Hz
 
   // if the round frequency checkbox is checked, round the frequency
   freqCheck.checked && (frequency = frequency.toFixed(1));
@@ -152,17 +150,17 @@ function showFrequency() {
   justFrequency.textContent = frequency; // show the frequency
 
   // take log base 2^(1/12) of the ratio between the current frequency and A4 to find the number of half-steps away from A4 - big decimal is approx. ln(2^(1/12))
-  const steps = Math.log(frequency/440)/0.05776226504666215;
+  const steps = Math.log(frequency / 440) / 0.05776226504666215;
   const roundSteps = Math.round(steps);
 
   // get the letter note and octave and show them
-  let fixSteps = roundSteps < 0 ? notes.length + roundSteps%notes.length : roundSteps%notes.length; // if lower than A4, add notes.length to reverse the index (I think)
+  let fixSteps = roundSteps < 0 ? notes.length + roundSteps % notes.length : roundSteps % notes.length; // if lower than A4, add notes.length to reverse the index (I think)
   fixSteps = fixSteps === 12 ? 0 : fixSteps; // if it's an A it'll end up 12, which we need to be zero
   const tempNote = notes[fixSteps]; // get the string from notes
 
   noteLetter.textContent = tempNote.charAt(0); // the first one is the letter
   accidental.textContent = tempNote.length > 1 ? tempNote.charAt(1) : ''; // then any accidentals
-  octave.textContent = Math.max(Math.floor((roundSteps + 9)/notes.length) + 4, 0); // have to add nine so it changes the octave on C instead of A, and limit it to zero 'cause negative octaves don't exist
+  octave.textContent = Math.max(Math.floor((roundSteps + 9) / notes.length) + 4, 0); // have to add nine so it changes the octave on C instead of A, and limit it to zero 'cause negative octaves don't exist
 
   // console.log((soundArray[midBin] - soundArray[lastHarmonic]), 280 - soundArray[midBin], midBin, tempNote+tempOctave); // for testing
 
@@ -175,6 +173,8 @@ function showFrequency() {
     noteDisplay.classList.replace('green', 'red');
   }
   fineTunePointer.style.transform = `rotate(${showFineTune}deg)`; // rotate the pointer to the right angle
+  
+  requestAnimationFrame(showFrequency); // run again
 }
 
 /**
@@ -218,7 +218,7 @@ function changeTicks() {
   }
 }
 
-// if the tuning radius is negative one, it's off, so set it to say that (have to use placeholder 'cause it's a number input)
+/** If the tuning radius is negative one, it's off, so set it to say that (have to use placeholder 'cause it's a number input) */
 function tuningOnOff() {
   if (parseInt(adjustTuning.value, 10) === -1) {
     showTuning.value = '';
